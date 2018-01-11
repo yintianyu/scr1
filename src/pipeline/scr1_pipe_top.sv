@@ -218,7 +218,9 @@ logic                                       dbg_run2halt;           // Transitio
 logic                                       dbg_halt2run;           // Transition to run state
 logic                                       dbg_run_start;          // First cycle of run state
 `endif // SCR1_DBGC_EN
-
+`ifdef SCR1_INSTR_SORT
+type_scr1_instr_sort_sel_e                  instr_sort;
+`endif // SCR1_INSTR_SORT
 
 //-------------------------------------------------------------------------------
 // Pipeline logic
@@ -303,6 +305,10 @@ scr1_pipe_idu i_pipe_idu (
     .idu2exu_use_imm    (),
 `endif // SCR1_EXU_STAGE_BYPASS
     .exu2idu_rdy        (exu2idu_rdy        ),
+
+`ifdef SCR1_INSTR_SORT
+    .instr_sort_sel     (instr_sort),
+`endif  // SCR1_INSTR_SORT
 
     .idu_busy           (idu_busy           )
 );
@@ -618,6 +624,10 @@ scr1_tracelog i_tracelog (
     .mcause_ec      (i_pipe_csr.csr_mcause_ec           ),
     .mtval          (i_pipe_csr.csr_mtval               ),
     .mstatus_mie_up (i_pipe_csr.csr2exu_mstatus_mie_up  )
+`ifdef SCR1_INSTR_SORT
+    ,
+    .instr_sort     (instr_sort)
+`endif  // SCR1_INSTR_SORT
 );
 
 `endif // SCR1_SIM_ENV

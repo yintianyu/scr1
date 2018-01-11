@@ -13,6 +13,9 @@ module scr1_pipe_idu
 `ifdef SCR1_SIM_ENV
     input   logic                           rst_n,
     input   logic                           clk,
+`ifdef SCR1_INSTR_SORT
+    output  type_scr1_instr_sort_sel_e      instr_sort_sel,                           
+`endif
 `endif // SCR1_SIM_ENV
 
     // IFU <-> IDU interface
@@ -59,6 +62,9 @@ logic                               rvc_illegal;
 `ifdef SCR1_RVE_EXT
 logic                               rve_illegal;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+type_scr1_instr_sort_sel_e          instr_sort;
+`endif  // SCR1_INSTR_SORT
 
 //-------------------------------------------------------------------------------
 // Decode
@@ -78,6 +84,10 @@ assign funct3       = (instr_type == SCR1_INSTR_RVI) ? instr[14:12] : instr[15:1
 assign funct7       = instr[31:25];                                                 // RVI
 assign funct12      = instr[31:20];                                                 // RVI (SYSTEM)
 assign shamt        = instr[24:20];                                                 // RVI
+
+`ifdef SCR1_INSTR_SORT
+assign instr_sort_sel = instr_sort;     // Sort Result
+`endif  // SCR1_INSTR_SORT
 
 // RV32I(MC) decode
 always_comb begin
@@ -136,6 +146,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[11])          rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVI_CAL;
+`endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_AUIPC
 
                     SCR1_OPCODE_LUI             : begin
@@ -146,6 +159,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[11])          rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVI_CAL;
+`endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_LUI
 
                     SCR1_OPCODE_JAL             : begin
@@ -178,6 +194,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[11] | instr[19])  rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVI_LS;
+`endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_LOAD
 
                     SCR1_OPCODE_STORE           : begin
@@ -195,6 +214,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[19] | instr[24])  rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVI_LS;
+`endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_STORE
 
                     SCR1_OPCODE_OP              : begin
@@ -243,6 +265,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[11] | instr[19] | instr[24])  rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVI_CAL;
+`endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_OP
 
                     SCR1_OPCODE_OP_IMM          : begin
@@ -288,6 +313,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[11] | instr[19])  rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVI_CAL;
+`endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_OP_IMM
 
                     SCR1_OPCODE_MISC_MEM    : begin
@@ -307,6 +335,9 @@ always_comb begin
                             end
                             default : rvi_illegal = 1'b1;
                         endcase // funct3
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVI_OTHER;
+`endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_MISC_MEM
 
                     SCR1_OPCODE_BRANCH          : begin
@@ -329,6 +360,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[19] | instr[24])  rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVI_CTRL;
+`endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_BRANCH
 
                     SCR1_OPCODE_JALR        : begin
@@ -348,6 +382,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[11] | instr[19])  rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVI_CTRL;
+`endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_JALR
 
                     SCR1_OPCODE_SYSTEM      : begin
@@ -447,6 +484,9 @@ always_comb begin
                             end
                             default : rvi_illegal = 1'b1;
                         endcase // funct3
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVI_OTHER;
+`endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_SYSTEM
 
                     default : begin
@@ -473,6 +513,9 @@ always_comb begin
                         idu2exu_cmd.rs1_addr    = SCR1_MPRF_SP_ADDR;
                         idu2exu_cmd.rd_addr     = {2'b01, instr[4:2]};
                         idu2exu_cmd.imm         = {22'd0, instr[10:7], instr[12:11], instr[5], instr[6], 2'b00};
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                     end
                     3'b010  : begin
                         // C.LW
@@ -483,6 +526,9 @@ always_comb begin
                         idu2exu_cmd.rs1_addr    = {2'b01, instr[9:7]};
                         idu2exu_cmd.rd_addr     = {2'b01, instr[4:2]};
                         idu2exu_cmd.imm         = {25'd0, instr[5], instr[12:10], instr[6], 2'b00};
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVC_LS;
+`endif  // SCR1_INSTR_SORT
                     end
                     3'b110  : begin
                         // C.SW
@@ -492,6 +538,9 @@ always_comb begin
                         idu2exu_cmd.rs1_addr    = {2'b01, instr[9:7]};
                         idu2exu_cmd.rs2_addr    = {2'b01, instr[4:2]};
                         idu2exu_cmd.imm         = {25'd0, instr[5], instr[12:10], instr[6], 2'b00};
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVC_LS;
+`endif  // SCR1_INSTR_SORT
                     end
                     default : begin
                         rvc_illegal = 1'b1;
@@ -517,6 +566,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[11])          rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                     end
                     3'b001  : begin
                         // C.JAL
@@ -525,6 +577,9 @@ always_comb begin
                         idu2exu_cmd.jump_req    = 1'b1;
                         idu2exu_cmd.rd_addr     = SCR1_MPRF_RA_ADDR;
                         idu2exu_cmd.imm         = {{21{instr[12]}}, instr[8], instr[10:9], instr[6], instr[7], instr[2], instr[11], instr[5:3], 1'b0};
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVC_CTRL;
+`endif  // SCR1_INSTR_SORT
                     end
                     3'b010  : begin
                         // C.LI
@@ -534,6 +589,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[11])          rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                     end
                     3'b011  : begin
                         if (~|{instr[12], instr[6:2]}) rvc_illegal = 1'b1;
@@ -546,6 +604,9 @@ always_comb begin
                             idu2exu_cmd.rs1_addr    = SCR1_MPRF_SP_ADDR;
                             idu2exu_cmd.rd_addr     = SCR1_MPRF_SP_ADDR;
                             idu2exu_cmd.imm         = {{23{instr[12]}}, instr[4:3], instr[5], instr[2], instr[6], 4'd0};
+`ifdef SCR1_INSTR_SORT
+                            instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                         end else begin
                             // C.LUI
                             idu2exu_cmd.rd_wb_sel   = SCR1_RD_WB_IMM;
@@ -554,6 +615,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                             if (instr[11])          rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                            instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                         end
                     end
                     3'b100  : begin
@@ -571,6 +635,9 @@ always_comb begin
                                 idu2exu_cmd.ialu_cmd    = SCR1_IALU_CMD_SRL;
                                 idu2exu_cmd.ialu_op     = SCR1_IALU_OP_REG_IMM;
                                 idu2exu_cmd.rd_wb_sel   = SCR1_RD_WB_IALU;
+`ifdef SCR1_INSTR_SORT
+                                instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                             end
                             2'b01   : begin
                                 if (instr[12])          rvc_illegal = 1'b1;
@@ -580,6 +647,9 @@ always_comb begin
                                 idu2exu_cmd.ialu_cmd    = SCR1_IALU_CMD_SRA;
                                 idu2exu_cmd.ialu_op     = SCR1_IALU_OP_REG_IMM;
                                 idu2exu_cmd.rd_wb_sel   = SCR1_RD_WB_IALU;
+`ifdef SCR1_INSTR_SORT
+                                instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                             end
                             2'b10   : begin
                                 // C.ANDI
@@ -588,6 +658,9 @@ always_comb begin
                                 idu2exu_cmd.ialu_op     = SCR1_IALU_OP_REG_IMM;
                                 idu2exu_cmd.rd_wb_sel   = SCR1_RD_WB_IALU;
                                 idu2exu_cmd.imm         = {{27{instr[12]}}, instr[6:2]};
+`ifdef SCR1_INSTR_SORT
+                                instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                             end
                             2'b11   : begin
                                 idu2exu_use_rs2         = 1'b1;
@@ -597,24 +670,36 @@ always_comb begin
                                         idu2exu_cmd.ialu_cmd    = SCR1_IALU_CMD_SUB;
                                         idu2exu_cmd.ialu_op     = SCR1_IALU_OP_REG_REG;
                                         idu2exu_cmd.rd_wb_sel   = SCR1_RD_WB_IALU;
+`ifdef SCR1_INSTR_SORT
+                                        instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                                     end
                                     3'b001  : begin
                                         // C.XOR
                                         idu2exu_cmd.ialu_cmd    = SCR1_IALU_CMD_XOR;
                                         idu2exu_cmd.ialu_op     = SCR1_IALU_OP_REG_REG;
                                         idu2exu_cmd.rd_wb_sel   = SCR1_RD_WB_IALU;
+`ifdef SCR1_INSTR_SORT
+                                        instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                                     end
                                     3'b010  : begin
                                         // C.OR
                                         idu2exu_cmd.ialu_cmd    = SCR1_IALU_CMD_OR;
                                         idu2exu_cmd.ialu_op     = SCR1_IALU_OP_REG_REG;
                                         idu2exu_cmd.rd_wb_sel   = SCR1_RD_WB_IALU;
+`ifdef SCR1_INSTR_SORT
+                                        instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                                     end
                                     3'b011  : begin
                                         // C.AND
                                         idu2exu_cmd.ialu_cmd    = SCR1_IALU_CMD_AND;
                                         idu2exu_cmd.ialu_op     = SCR1_IALU_OP_REG_REG;
                                         idu2exu_cmd.rd_wb_sel   = SCR1_RD_WB_IALU;
+`ifdef SCR1_INSTR_SORT
+                                        instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                                     end
                                     default : begin
                                         rvc_illegal = 1'b1;
@@ -629,6 +714,9 @@ always_comb begin
                         idu2exu_cmd.sum2_op     = SCR1_SUM2_OP_PC_IMM;
                         idu2exu_cmd.jump_req    = 1'b1;
                         idu2exu_cmd.imm         = {{21{instr[12]}}, instr[8], instr[10:9], instr[6], instr[7], instr[2], instr[11], instr[5:3], 1'b0};
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVC_CTRL;
+`endif  // SCR1_INSTR_SORT
                     end
                     3'b110  : begin
                         // C.BEQZ
@@ -642,6 +730,9 @@ always_comb begin
                         idu2exu_cmd.rs1_addr    = {2'b01, instr[9:7]};
                         idu2exu_cmd.rs2_addr    = SCR1_MPRF_ZERO_ADDR;
                         idu2exu_cmd.imm         = {{24{instr[12]}}, instr[6:5], instr[2], instr[11:10], instr[4:3], 1'b0};
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVC_CTRL;
+`endif  // SCR1_INSTR_SORT
                     end
                     3'b111  : begin
                         // C.BNEZ
@@ -655,6 +746,9 @@ always_comb begin
                         idu2exu_cmd.rs1_addr    = {2'b01, instr[9:7]};
                         idu2exu_cmd.rs2_addr    = SCR1_MPRF_ZERO_ADDR;
                         idu2exu_cmd.imm         = {{24{instr[12]}}, instr[6:5], instr[2], instr[11:10], instr[4:3], 1'b0};
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVC_CTRL;
+`endif  // SCR1_INSTR_SORT
                     end
                 endcase // funct3
             end // Quadrant 1
@@ -678,6 +772,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[11])          rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                     end
                     3'b010  : begin
                         if (~|instr[11:7])      rvc_illegal = 1'b1;
@@ -693,6 +790,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[11])          rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVC_LS;
+`endif  // SCR1_INSTR_SORT
                     end
                     3'b100  : begin
                         if (~instr[12]) begin
@@ -709,6 +809,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                                 if (instr[11]|instr[6]) rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                                instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                             end else begin
                                 if (~|instr[11:7])      rvc_illegal = 1'b1;
                                 // C.JR
@@ -720,12 +823,18 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                                 if (instr[11])          rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                                instr_sort              = SCR1_INSTR_SORT_RVC_CTRL;
+`endif  // SCR1_INSTR_SORT
                             end
                         end else begin  // instr[12] == 1
                             if (~|instr[11:2]) begin
                                 // C.EBREAK
                                 idu2exu_cmd.exc_req     = 1'b1;
                                 idu2exu_cmd.exc_code    = SCR1_EXC_CODE_BREAKPOINT;
+`ifdef SCR1_INSTR_SORT
+                                instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                             end else if (~|instr[6:2]) begin
                                 // C.JALR
                                 idu2exu_use_rs1         = 1'b1;
@@ -740,6 +849,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                                 if (instr[11])          rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                                instr_sort              = SCR1_INSTR_SORT_RVC_CTRL;
+`endif  // SCR1_INSTR_SORT
                             end else begin
                                 // C.ADD
                                 idu2exu_use_rs1         = 1'b1;
@@ -754,6 +866,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                                 if (instr[11]|instr[6]) rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                                instr_sort              = SCR1_INSTR_SORT_RVC_CAL;
+`endif  // SCR1_INSTR_SORT
                             end
                         end // instr[12] == 1
                     end
@@ -770,6 +885,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[6])           rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVC_LS;
+`endif  // SCR1_INSTR_SORT
                     end
                     default : begin
                         rvc_illegal = 1'b1;

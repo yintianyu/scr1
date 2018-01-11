@@ -177,5 +177,31 @@ typedef struct packed {
     type_scr1_exc_code_e                exc_code;
 } type_scr1_exu_cmd_s;
 
+
+//-------------------------------------------------------------------------------
+// IDU to EXU full command structure
+//-------------------------------------------------------------------------------
+`ifdef SCR1_INSTR_SORT
+`ifndef SCR1_RVC_EXT
+localparam SCR1_INSTR_SORT_ALL_NUM_E = 4;
+`else
+localparam SCR1_INSTR_SORT_ALL_NUM_E = 8;
+`endif // ~SCR1_RVC_EXT
+localparam SCR1_INSTR_SORT_WIDTH_E = $clog2(SCR1_INSTR_SORT_ALL_NUM_E);
+typedef enum logic[SCR1_INSTR_SORT_WIDTH_E - 1: 0]{
+    SCR1_INSTR_SORT_RVI_CAL = '0,
+    SCR1_INSTR_SORT_RVI_CTRL,
+    SCR1_INSTR_SORT_RVI_LS,
+    SCR1_INSTR_SORT_RVI_OTHER
+`ifdef SCR1_RVC_EXT
+    ,
+    SCR1_INSTR_SORT_RVC_CAL,
+    SCR1_INSTR_SORT_RVC_CTRL,
+    SCR1_INSTR_SORT_RVC_LS,
+    SCR1_INSTR_SORT_RVC_OTHER
+`endif // SCR1_RVC_EXT
+} type_scr1_instr_sort_sel_e;
+`endif // SCR1_INSTR_SORT
+
 `endif // SCR1_RISCV_ISA_DECODING_SVH
 

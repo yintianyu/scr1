@@ -6,6 +6,9 @@
 `include "scr1_arch_description.svh"
 `include "scr1_arch_types.svh"
 `include "scr1_csr.svh"
+`ifdef SCR1_INSTR_SORT
+`include "scr1_riscv_isa_decoding.svh"
+`endif  // SCR1_INSTR_SORT
 
 module scr1_tracelog (
     input   logic                                   rst_n,
@@ -43,6 +46,10 @@ module scr1_tracelog (
     input   type_scr1_exc_code_e                    mcause_ec,
     input   logic [`SCR1_XLEN-1:0]                  mtval,
     input   logic                                   mstatus_mie_up
+`ifdef SCR1_INSTR_SORT
+    ,
+    input   type_scr1_instr_sort_sel_e              instr_sort
+`endif  // SCR1_INSTR_SORT
 );
 
 //-------------------------------------------------------------------------------
@@ -135,6 +142,8 @@ always_ff @(negedge rst_n, posedge clk) begin
     end
 end
 
+
+
 //-------------------------------------------------------------------------------
 // Trace log MPRF
 //-------------------------------------------------------------------------------
@@ -153,9 +162,13 @@ logic [`SCR1_MPRF_ADDR_WIDTH-1:0]   mprf_addr;
 logic                               tracelog_full;
 int unsigned                        trace_fhandler;
 int unsigned                        trace_fhandler_diff;
+
 int                                 time_cnt2;
 string                              hart;
 string                              test_name;
+
+
+
 
 task trace_write_mprf;
     $fwrite(trace_fhandler,  "%12d ", time_cnt);
@@ -218,6 +231,7 @@ initial begin
     temp_fhandler = $fopen({"trace_csr_", hart, ".log"}, "w");
     $fclose(temp_fhandler);
 end
+
 
 always_ff @(negedge rst_n, posedge clk) begin
     if (~rst_n) begin
@@ -416,5 +430,110 @@ always_ff @(negedge rst_n, posedge clk) begin
 end
 
 `endif // SCR1_TRACE_LOG_EN
+
+
+//-------------------------------------------------------------------------------
+// Trace log Instruction Sort
+//-------------------------------------------------------------------------------
+`ifdef SCR1_INSTR_SORT
+
+int unsigned                        trace_fhandler_instr_sort;
+int                                 rvi_cal_count;
+int                                 rvi_ctrl_count;
+int                                 rvi_ls_count;
+int                                 rvi_other_count;
+`ifdef SCR1_RVC_EXT
+int                                 rvc_cal_count;
+int                                 rvc_ctrl_count;
+int                                 rvc_ls_count;
+int                                 rvc_other_count;
+`endif //SCR1_RVC_EXT
+int                                 other_count;
+always_ff @(negedge rst_n, posedge clk) begin
+    if (~rst_n) begin
+        if (trace_fhandler_instr_sort) begin
+            $fflush(trace_fhandler_instr_sort);
+            $fclose(trace_fhandler_instr_sort);
+            trace_fhandler_instr_sort <= 0;
+        end
+            rvi_cal_count               <= 0;
+            rvi_ctrl_count              <= 0;
+            rvi_ls_count                <= 0;
+            rvi_other_count             <= 0;
+`ifdef SCR1_RVC_EXT
+            rvc_cal_count               <= 0;
+            rvc_ctrl_count              <= 0;
+            rvc_ls_count                <= 0;
+            rvc_other_count             <= 0;
+`endif //SCR1_RVC_EXT
+            other_count                 <= 0;
+    end
+    else begin
+        if(trace_fhandler_instr_sort == 0) begin
+            trace_fhandler_instr_sort = $fopen({"scr1_instr_sort_", hart, ".log"}, "w");
+            $fwrite(trace_fhandler_instr_sort, "rvi_cal_count   ");
+            $fwrite(trace_fhandler_instr_sort, "rvi_ctrl_count   ");
+            $fwrite(trace_fhandler_instr_sort, "rvi_ls_count   ");
+            $fwrite(trace_fhandler_instr_sort, "rvi_other_count   ");
+`ifdef SCR1_RVC_EXT
+            $fwrite(trace_fhandler_instr_sort, "rvc_cal_count   ");
+            $fwrite(trace_fhandler_instr_sort, "rvc_ctrl_count   ");
+            $fwrite(trace_fhandler_instr_sort, "rvc_ls_count   ");
+            $fwrite(trace_fhandler_instr_sort, "rvc_other_count   ");
+`endif //SCR1_RVC_EXT
+            $fwrite(trace_fhandler_instr_sort, "other_count\n");
+        end
+        else begin
+            if (trace_update_r) begin
+                case (instr_sort)
+                SCR1_INSTR_SORT_RVI_CAL: begin
+                    rvi_cal_count           <= rvi_cal_count + 1;
+                end
+                SCR1_INSTR_SORT_RVI_CTRL: begin
+                    rvi_ctrl_count          <= rvi_ctrl_count + 1;
+                end
+                SCR1_INSTR_SORT_RVI_LS: begin
+                    rvi_ls_count            <= rvi_ls_count + 1;
+                end
+                SCR1_INSTR_SORT_RVI_OTHER: begin
+                    rvi_other_count         <= rvi_other_count + 1;
+                end
+                SCR1_INSTR_SORT_RVC_CAL: begin
+                    rvc_cal_count           <= rvc_cal_count + 1;
+                end
+                SCR1_INSTR_SORT_RVC_CTRL: begin
+                    rvc_ctrl_count          <= rvc_ctrl_count + 1;
+                end
+                SCR1_INSTR_SORT_RVC_LS: begin
+                    rvc_ls_count            <= rvc_ls_count + 1;
+                end
+                SCR1_INSTR_SORT_RVC_OTHER: begin
+                    rvc_other_count         <= rvc_other_count + 1;
+                end
+                default: begin
+                    other_count             <= other_count + 1;
+                end
+                endcase
+            end
+            $fwrite(trace_fhandler_instr_sort, "%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\n",
+                    rvi_cal_count,
+                    rvi_ctrl_count,
+                    rvi_ls_count,
+                    rvi_other_count,
+                    rvc_cal_count,
+                    rvc_ctrl_count,
+                    rvc_ls_count,
+                    rvc_other_count,
+                    other_count);
+        end
+    end
+end
+
+
+
+
+
+
+`endif // SCR1_INSTR_SORT
 
 endmodule : scr1_tracelog

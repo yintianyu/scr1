@@ -70,17 +70,6 @@ logic                                   dmem_hresp;
 
 // Data Read
 logic[80 * 8:1]							filename_memory;
-//logic[80 * 8:1]							filename_conv1_weight;
-//logic[80 * 8:1]							filename_conv3_bias;
-//logic[80 * 8:1]							filename_conv3_weight;
-//logic[80 * 8:1]							filename_conv4_bias;
-//logic[80 * 8:1]							filename_conv4_weight;
-//logic[80 * 8:1]							filename_dense7_bias;
-//logic[80 * 8:1]							filename_dense7_weight;
-//logic[80 * 8:1]							filename_dense8_bias;
-//logic[80 * 8:1]							filename_dense8_weight;
-//logic[80 * 8:1]							filename_mnist_test;
-//logic[80 * 8:1]							filename_mnist_label;
 
 int                                     file;
 
