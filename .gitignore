@@ -1,1 +1,6 @@
 build/**
+*.vtg
+*.hex
+*.vpj
+*.vpw
+*.vpwhist

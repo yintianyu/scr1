@@ -5,6 +5,7 @@
 
 `include "scr1_arch_description.svh"
 `include "scr1_ahb.svh"
+`include "lenet_define.svh"
 `ifdef SCR1_IPIC_EN
 `include "scr1_ipic.svh"
 `endif // SCR1_IPIC_EN
@@ -67,6 +68,25 @@ logic                                   dmem_hready;
 logic   [SCR1_AHB_WIDTH-1:0]            dmem_hrdata;
 logic                                   dmem_hresp;
 
+// Data Read
+logic[80 * 8:1]							filename_memory;
+//logic[80 * 8:1]							filename_conv1_weight;
+//logic[80 * 8:1]							filename_conv3_bias;
+//logic[80 * 8:1]							filename_conv3_weight;
+//logic[80 * 8:1]							filename_conv4_bias;
+//logic[80 * 8:1]							filename_conv4_weight;
+//logic[80 * 8:1]							filename_dense7_bias;
+//logic[80 * 8:1]							filename_dense7_weight;
+//logic[80 * 8:1]							filename_dense8_bias;
+//logic[80 * 8:1]							filename_dense8_weight;
+//logic[80 * 8:1]							filename_mnist_test;
+//logic[80 * 8:1]							filename_mnist_label;
+
+int                                     file;
+
+
+//logic   [7:0]                           temp_memory[0 : `SIZE_DATA * `CONV1_WEIGHT - 1];
+
 int unsigned                            f_results;
 int unsigned                            f_info;
 string                                  s_results;
@@ -113,9 +133,16 @@ initial begin
     f_info      = $fopen(s_info, "r");
     f_results   = $fopen(s_results, "a");
 
+
+// Prepare Memory Data
+    filename_memory = "./data/memory.lists";
+
+
+    $readmemh(filename_memory, i_memory_tb.memory);
+
     forever begin
         if ($feof(f_info)) break;
-        $fscanf(f_info, "%s\n", i_memory_tb.stuff_file);
+        file = $fscanf(f_info, "%s\n", i_memory_tb.stuff_file);
         i_top.i_core_top.i_pipe_top.i_tracelog.test_name = i_memory_tb.stuff_file;
         $write("\033[0;34m---Test: %s\033[0m\n", i_memory_tb.stuff_file);
         reset();
