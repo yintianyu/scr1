@@ -174,6 +174,9 @@ always_comb begin
 `ifdef SCR1_RVE_EXT
                         if (instr[11])          rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVI_CTRL;
+`endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_JAL
 
                     SCR1_OPCODE_LOAD            : begin
