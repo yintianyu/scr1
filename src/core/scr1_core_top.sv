@@ -7,6 +7,10 @@
 `include "scr1_arch_types.svh"
 `include "scr1_memif.svh"
 
+`ifdef SCR1_RVY_EXT
+`include "ytydla_define.svh"
+`endif // SCR1_RVY_EXT
+
 `ifdef SCR1_DBGC_EN
 `include "scr1_tapc.svh"
 `include "scr1_dbgc.svh"
@@ -55,6 +59,19 @@ module scr1_core_top (
     output  logic [`SCR1_IMEM_AWIDTH-1:0]           imem_addr,
     input   logic [`SCR1_IMEM_DWIDTH-1:0]           imem_rdata,
     input   type_scr1_mem_resp_e                    imem_resp,
+
+`ifdef SCR1_RVY_EXT
+    // Data Memory at High Speed Interface
+    input   logic                                   dmem_y_req_ack,
+    output  logic                                   dmem_y_req,
+    output  type_scr1_mem_cmd_e                     dmem_y_cmd,
+    output  type_scr1_mem_y_width_e                 dmem_y_width,
+    output  logic [`SCR1_DMEM_AWIDTH-1:0]           dmem_y_addr,
+    output  logic [`YTYDLA_LSU_WIDTH-1:0]           dmem_y_wdata,
+    input   logic [`YTYDLA_LSU_WIDTH-1:0]           dmem_y_rdata,
+    input   type_scr1_mem_resp_e                    dmem_y_resp,
+`endif // SCR1_RVY_EXT
+
 
     // Data Memory Interface
     input   logic                                   dmem_req_ack,
@@ -141,6 +158,10 @@ logic                                           exu_busy;
 logic                                           lsu_busy;
 logic                                           ialu_busy;
 
+`ifdef SCR1_RVY_EXT
+logic                                           lsu_y_busy;
+`endif // SCR1_RVY_EXT
+
 //-------------------------------------------------------------------------------
 // Reset Logic
 //-------------------------------------------------------------------------------
@@ -202,6 +223,19 @@ scr1_pipe_top i_pipe_top (
     .dmem_req_ack           (dmem_req_ack       ),
     .dmem_rdata             (dmem_rdata         ),
     .dmem_resp              (dmem_resp          ),
+
+`ifdef SCR1_RVY_EXT
+    // Data memory interface
+    .dmem_y_req               (dmem_y_req           ),
+    .dmem_y_cmd               (dmem_y_cmd           ),
+    .dmem_y_width             (dmem_y_width         ),
+    .dmem_y_addr              (dmem_y_addr          ),
+    .dmem_y_wdata             (dmem_y_wdata         ),
+    .dmem_y_req_ack           (dmem_y_req_ack       ),
+    .dmem_y_rdata             (dmem_y_rdata         ),
+    .dmem_y_resp              (dmem_y_resp          ),
+`endif  // SCR1_RVY_EXT
+
 `ifdef SCR1_DBGC_EN
     // Debug interface
     .dbgc_hart_cmd          (dbgc_hart_cmd      ),
@@ -231,6 +265,9 @@ scr1_pipe_top i_pipe_top (
     .exu_busy               (exu_busy           ),
     .lsu_busy               (lsu_busy           ),
     .ialu_busy              (ialu_busy          ),
+`ifdef SCR1_RVY_EXT
+    .lsu_y_busy               (lsu_y_busy           ),
+`endif // SCR1_RVY_EXT
     // Fuse
     .fuse_mhartid           (fuse_mhartid       )
 );

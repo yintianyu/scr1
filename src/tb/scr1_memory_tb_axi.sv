@@ -15,6 +15,46 @@ module scr1_memory_tb_axi #(
     input   logic                          rst_n,
     input   logic                          clk,
 
+`ifdef SCR1_RVY_EXT
+    // Write address channel
+    input  logic                           y_awvalid,
+    input  logic            [W_ID-1:0]     y_awid,
+    input  logic            [W_ADR-1:0]    y_awaddr,
+    input  logic            [2:0]          y_awsize,
+    input  logic            [7:0]          y_awlen,
+    output logic                           y_awready,
+
+    // Write data channel
+    input  logic                           y_wvalid,
+    input  logic [`YTYDLA_LSU_WIDTH-1:0]   y_wdata,
+    input  logic            [W_DATA/8-1:0] y_wstrb,
+    input  logic                           y_wlast,
+    output logic                           y_wready,
+
+    // Write response channel
+    input  logic                           y_bready,
+    output logic                           y_bvalid,
+    output logic            [W_ID-1:0]     y_bid,
+    output logic            [1:0]          y_bresp,
+
+    // Read address channel
+    input  logic                           y_arvalid,
+    input  logic            [W_ID-1:0]     y_arid,
+    input  logic            [W_ADR-1:0]    y_araddr,
+    input  logic            [1:0]          y_arburst,
+    input  logic            [2:0]          y_arsize,
+    input  logic            [7:0]          y_arlen,
+    output logic                           y_arready,
+
+    // Read data channel
+    input  logic                           y_rready,
+    output logic                           y_rvalid,
+    output logic            [W_ID-1:0]     y_rid,
+    output logic [`YTYDLA_LSU_WIDTH-1:0]   y_rdata,
+    output logic                           y_rlast,
+    output logic            [1:0]          y_rresp,
+`endif // SCR1_RVY_EXT
+
     // Write address channel
     input  logic [N_IF-1:0]                awvalid,
     input  logic [N_IF-1:0] [W_ID-1:0]     awid,
@@ -69,9 +109,34 @@ string                                       stuff_file;
 genvar                                       gi;
 genvar                                       gj;
 
+logic[80 * 8:1]							     filename_memory;
+
+`ifdef SCR1_RVY_EXT
+logic   [W_ADR-1:0]                          y_awaddr_hold;
+logic   [2:0]                                y_awsize_hold;
+`endif // SCR1_RVY_EXT
+
 //-------------------------------------------------------------------------------
 // Local functions
 //-------------------------------------------------------------------------------
+`ifdef SCR1_RVY_EXT
+function automatic logic [`YTYDLA_LSU_WIDTH-1:0] mem_read_y (
+    logic [W_ADR:0] adr,
+    int             bytes_num,
+    int             bytes_max
+    );
+
+    mem_read_y  = 'x;
+    $display("In mem_read_y:\n");
+    $display("adr = 0x%x\n", adr);
+    
+
+    for (int i = 0; i < bytes_num; ++i) begin
+        mem_read_y[(i*8)+:8] = memory[adr + i];
+        $display("memory[0x%x] = 0x%x\n",adr + i, memory[adr + i]);
+    end
+endfunction : mem_read_y
+`endif // SCR1_RVY_EXT
 
 function automatic logic [W_DATA-1:0] mem_read (
     logic [W_ADR:0] adr,
@@ -125,10 +190,98 @@ endfunction : mem_write
 //-------------------------------------------------------------------------------
 // Load file to mem
 //-------------------------------------------------------------------------------
+
 always @(negedge rst_n) begin
+    filename_memory = "./data/memory.lists";
     memory = '{SIZE{'0}};
     if(stuff_file.len()>0) $readmemh(stuff_file,memory);
+    $readmemh(filename_memory, memory);
 end
+
+
+// High Speed AXI
+`ifdef SCR1_RVY_EXT
+//-------------------------------------------------------------------------------
+// Read operation
+//-------------------------------------------------------------------------------
+always @(posedge clk, negedge rst_n) begin
+    if(~rst_n) begin
+        y_arready <= 1'b1;
+        y_rvalid  <= 1'b0;
+        y_rresp   <= 2'd3;
+        y_rdata   <= 'x;
+        y_rlast   <= 1'b0;
+        y_rid     <= '0;
+    end else begin
+
+        // Read data: acked
+        if( y_rvalid & y_rready ) begin
+            y_arready <= 1'b1;
+            y_rvalid  <= 1'b0;
+        end else if( y_rvalid & !y_rready ) begin
+            y_arready <= 1'b0;
+        end
+
+        // Read data: valid
+        if( y_arvalid & y_arready & ~(y_rvalid & !y_rready) ) begin
+
+            y_rvalid <= 1'b1;
+            y_rresp  <= '0;
+            y_rlast  <= 1'b1;
+            y_rid    <= y_arid;
+
+            y_rdata  <= mem_read_y( y_araddr,
+                                    4 * y_arsize,
+                                    W_DATA/8 );
+        end
+    end
+end
+
+//-------------------------------------------------------------------------------
+// Write operation
+//-------------------------------------------------------------------------------
+always @(posedge clk, negedge rst_n) begin
+    if(~rst_n) begin
+        y_bvalid  <= '0;
+        y_bresp   <= 2'd3;
+        y_awready <= 1'b1;
+        y_wready  <= 1'b1;
+    end else begin
+
+        // Write data: response
+        if( y_bvalid & y_bready ) begin
+            y_bvalid  <= 1'b0;
+            y_awready <= 1'b1;
+            y_wready  <= 1'b1;
+        end else if( y_bvalid & !y_bready ) begin
+            y_awready <= 1'b0;
+            y_wready  <= 1'b0;
+        end
+
+        // Write data: get address
+        if( y_awvalid & y_awready & ~(y_bvalid & !y_bready) ) begin
+            y_bid <= y_awid;
+            if( ~y_wvalid ) begin
+                y_awaddr_hold <= y_awaddr;
+                y_awsize_hold <= y_awsize;
+                y_awready <= 1'b0;
+            end
+        end
+
+        // Write data: get data
+        if( y_wvalid & y_wready & y_wlast ) begin
+            y_bvalid <= 1'b1;
+            y_bresp  <= '0;
+
+//          mem_write( y_awready ? y_awaddr : y_awaddr_hold,
+//                     y_wdata,
+//                     y_wstrb,
+//                     2**(y_awready ? y_awsize : y_awsize_hold),
+//                     W_DATA/8 );
+        end
+    end
+end
+`endif // SCR1_RVY_EXT
 
 generate for(gi=0; gi<N_IF; ++gi) begin : rw_if
 

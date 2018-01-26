@@ -9,6 +9,10 @@
 `include "scr1_riscv_isa_decoding.svh"
 `include "scr1_csr.svh"
 
+`ifdef SCR1_RVY_EXT
+`include "ytydla_define.svh"
+`endif // SCR1_RVY_EXT
+
 `ifdef SCR1_DBGC_EN
  `include "scr1_dbgc.svh"
 `endif // SCR1_DBGC_EN
@@ -77,6 +81,18 @@ module scr1_pipe_exu (
     input   logic [`SCR1_DMEM_DWIDTH-1:0]       dmem2exu_rdata,         // Data memory read data
     input   type_scr1_mem_resp_e                dmem2exu_resp,          // Data memory response
 
+`ifdef SCR1_RVY_EXT
+    // EXU <-> DMEM High Speed interface
+    output  logic                               exu2dmem_y_req,           // Data memory request
+    output  type_scr1_mem_cmd_e                 exu2dmem_y_cmd,           // Data memory command
+    output  type_scr1_mem_y_width_e             exu2dmem_y_width,         // Data memory width
+    output  logic [`SCR1_DMEM_AWIDTH-1:0]       exu2dmem_y_addr,          // Data memory address
+    output  logic [`YTYDLA_LSU_WIDTH-1:0]       exu2dmem_y_wdata,         // Data memory write data
+    input   logic                               dmem2exu_y_req_ack,       // Data memory request acknowledge
+    input   logic [`YTYDLA_LSU_WIDTH-1:0]       dmem2exu_y_rdata,         // Data memory read data
+    input   type_scr1_mem_resp_e                dmem2exu_y_resp,          // Data memory response
+`endif // SCR1_RVY_EXT
+
     // EXU control
     output  logic                               exu_exc_req,            // Exception on last instruction
     output  logic                               brkpt,                  // Breakpoint on current instruction
@@ -87,6 +103,9 @@ module scr1_pipe_exu (
     output  logic                               exu_busy,               // EXU busy
     output  logic                               lsu_busy,               // LSU busy
     output  logic                               ialu_busy,              // IALU busy
+`ifdef SCR1_RVY_EXT
+    output  logic                               lsu_y_busy,              // LSU at High Speed busy
+`endif  // SCR1_RVY_EXT
 
 `ifdef SCR1_DBGC_EN
     // EXU <-> DBGC interface
@@ -155,12 +174,33 @@ logic [`SCR1_XLEN-1:0]          ialu_res;
 logic [`SCR1_XLEN-1:0]          ialu_sum2_res;
 logic                           ialu_cmp;
 
+`ifdef SCR1_RVY_EXT
+logic                           dla_rdy;
+logic                           dla_req;
+logic [`SCR1_XLEN-1:0]          dla_op1;
+logic [`SCR1_XLEN-1:0]          dla_op2;
+logic [`SCR1_XLEN-1:0]          dla_size;
+logic [`SCR1_XLEN-1:0]          dla_res;
+
+// LSU at High Speed
+logic [`SCR1_XLEN-1:0]          lsu_y_addr;
+`endif  // SCR1_RVY_EXT
+
 // LSU signals
 logic                           lsu_req;
 logic                           lsu_rdy;
 logic [`SCR1_XLEN-1:0]          lsu_l_data;
 logic                           lsu_exc;
 type_scr1_exc_code_e            lsu_exc_code;
+
+// LSU to YTYDLA signals
+`ifdef SCR1_RVY_EXT
+logic                           lsu_y_req;
+logic                           lsu_y_rdy;
+logic [`YTYDLA_LSU_WIDTH-1:0]   lsu_y_l_data;
+logic                           lsu_y_exc;
+type_scr1_exc_code_e            lsu_y_exc_code;
+`endif // SCR1_RVY_EXT
 
 // CSR signals
 enum logic {SCR1_CSR_INIT,
@@ -186,6 +226,17 @@ logic [`SCR1_XLEN-1:0]          inc_pc;
 logic                           exu_exc_req_r;
 `endif // SCR1_DBGC_EN
 
+`ifdef SCR1_RVY_EXT
+// Write back to DLA
+logic                           exu2dla_wreq;
+
+// Phony brkm signal
+logic                           brkm2lsu_i_x_req_y;
+logic                           brkm2lsu_d_x_req_y;
+
+// Phony Store_y signal
+logic[`YTYDLA_LSU_WIDTH-1:0]    exu2lsu_y_sdata;
+`endif  // SCR1_RVY_EXT
 
 //-------------------------------------------------------------------------------
 // Instruction queue
@@ -228,6 +279,12 @@ always_ff @(posedge clk) begin
         exu_queue.wfi_req        <= idu2exu_cmd.wfi_req;
         exu_queue.exc_req        <= idu2exu_cmd.exc_req;
         exu_queue.exc_code       <= idu2exu_cmd.exc_code;
+`ifdef SCR1_RVY_EXT
+        exu_queue.rd_wb_y_sel    <= idu2exu_cmd.rd_wb_y_sel;
+        exu_queue.rd_wb_y_addr   <= idu2exu_cmd.rd_wb_y_addr;
+        exu_queue.dla_cmd        <= idu2exu_cmd.dla_cmd;
+        exu_queue.lsu_y_cmd      <= idu2exu_cmd.lsu_y_cmd;
+`endif  // SCR1_RVY_EXT
         if (idu2exu_use_rs1) begin
             exu_queue.rs1_addr   <= idu2exu_cmd.rs1_addr;
         end
@@ -306,6 +363,27 @@ always_comb begin
         ialu_sum2_op1 = curr_pc;
         ialu_sum2_op2 = exu_queue.imm;
     end
+
+`ifdef SCR1_RVY_EXT
+    // DLA
+    if (exu_queue.dla_cmd != SCR1_DLA_CMD_NONE) begin
+        dla_op1  = mprf2exu_rs1_data;
+        dla_op2  = mprf2exu_rs2_data;
+        dla_size = exu_queue.imm;
+    end
+    else begin
+        dla_op1  = 'b0;
+        dla_op2  = 'b0;
+        dla_size = 'b0;
+    end
+    // LSU_Y
+    if (exu_queue.lsu_y_cmd != SCR1_LSU_Y_CMD_NONE) begin
+        lsu_y_addr = mprf2exu_rs1_data;
+    end
+    else begin
+        lsu_y_addr = 'b0;
+    end
+`endif  // SCR1_RVY_EXT
 end
 
 assign exu2mprf_rs1_addr    = `SCR1_MPRF_ADDR_WIDTH'(exu_queue.rs1_addr);
@@ -348,6 +426,30 @@ scr1_pipe_ialu i_ialu(
 
 
 //-------------------------------------------------------------------------------
+// Yin Tianyu's Deep Learning Accelerator (YTYDLA)
+//-------------------------------------------------------------------------------
+`ifdef SCR1_RVY_EXT
+assign dla_req  = ((exu_queue.dla_cmd != SCR1_DLA_CMD_NONE) & exu_queue_vd);
+assign exu2dla_wreq = (exu_queue.rd_wb_y_sel != SCR1_RD_WB_NONE) & exu_queue_vd & ~exc_req & exu_rdy;
+
+ytydla i_dla(
+    .rst_n              (rst_n),
+    .clk                (clk),
+
+    .dla_req            (dla_req),
+    .dat_addr           (dla_op1),
+    .wt_addr            (dla_op2),
+    .size               (dla_size),
+    .result             (dla_res),
+    .res_vld            (dla_rdy),
+    .exu2dla_wdata      (lsu_y_l_data),
+    .exu2dla_wreq       (exu2dla_wreq),
+    .exu2dla_waddr      (exu_queue.rd_wb_y_addr)
+    );
+`endif  // SCR1_RVY_EXT
+
+
+//-------------------------------------------------------------------------------
 // Load/Store
 //-------------------------------------------------------------------------------
 assign lsu_req  = ((exu_queue.lsu_cmd != SCR1_LSU_CMD_NONE) & exu_queue_vd);
@@ -382,6 +484,47 @@ scr1_pipe_lsu i_lsu(
     .dmem2lsu_resp      (dmem2exu_resp)         // DMEM response
 );
 
+
+//-------------------------------------------------------------------------------
+// Load/Store at High Speed
+//-------------------------------------------------------------------------------
+`ifdef SCR1_RVY_EXT
+assign lsu_y_req  = ((exu_queue.lsu_y_cmd != SCR1_LSU_CMD_NONE) & exu_queue_vd);
+assign brkm2lsu_d_x_req_y = 0;
+assign brkm2lsu_i_x_req_y = 0;
+assign exu2lsu_y_sdata = 'b0;
+
+scr1_pipe_lsu_highspeed i_lsu_y(
+    .rst_n              (rst_n),
+    .clk                (clk),
+
+    .exu2lsu_req        (lsu_y_req),              // Request to LSU
+    .exu2lsu_cmd        (exu_queue.lsu_y_cmd),    // LSU command
+    .exu2lsu_addr       (lsu_y_addr),             // DMEM address
+    .exu2lsu_s_data     (exu2lsu_y_sdata),        // Data for store to DMEM
+    .lsu2exu_rdy        (lsu_y_rdy),              // LSU ready
+    .lsu2exu_l_data     (lsu_y_l_data),           // Loaded data form DMEM
+    .lsu2exu_exc        (lsu_y_exc),              // LSU exception
+    .lsu2exu_exc_code   (lsu_y_exc_code),         // LSU exception code
+    .lsu_busy           (lsu_y_busy),             // LSU busy
+
+`ifdef SCR1_BRKM_EN
+    .lsu2brkm_d_mon     (),
+    .brkm2lsu_i_x_req   (brkm2lsu_i_x_req_y),
+    .brkm2lsu_d_x_req   (brkm2lsu_d_x_req_y),
+`endif // SCR1_BRKM_EN
+
+    .lsu2dmem_req       (exu2dmem_y_req),         // DMEM request
+    .lsu2dmem_cmd       (exu2dmem_y_cmd),         // DMEM command
+    .lsu2dmem_width     (exu2dmem_y_width),       // DMEM width
+    .lsu2dmem_addr      (exu2dmem_y_addr),        // DMEM address
+    .lsu2dmem_wdata     (exu2dmem_y_wdata),       // DMEM write data
+    .dmem2lsu_req_ack   (dmem2exu_y_req_ack),     // DMEM request acknowledge
+    .dmem2lsu_rdata     (dmem2exu_y_rdata),       // DMEM read data
+    .dmem2lsu_resp      (dmem2exu_y_resp)         // DMEM response
+);
+
+`endif // SCR1_RVY_EXT
 
 //-------------------------------------------------------------------------------
 // CSR logic
@@ -689,6 +832,10 @@ always_comb begin
         ialu_vd                 : exu_rdy = ialu_rdy;
 `endif // SCR1_RVM_EXT
         csr2exu_mstatus_mie_up  : exu_rdy = 1'b0;
+`ifdef SCR1_RVY_EXT
+        dla_req                 : exu_rdy = dla_rdy;
+        lsu_y_req               : exu_rdy = lsu_y_rdy | lsu_y_exc;
+`endif // SCR1_RVY_EXT
         default                 : exu_rdy = 1'b1;
     endcase
 end

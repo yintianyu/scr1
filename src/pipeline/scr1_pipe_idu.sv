@@ -111,6 +111,12 @@ always_comb begin
     idu2exu_cmd.imm         = '0;
     idu2exu_cmd.exc_req     = 1'b0;
     idu2exu_cmd.exc_code    = SCR1_EXC_CODE_INSTR_MISALIGN;
+`ifdef SCR1_RVY_EXT
+    idu2exu_cmd.rd_wb_y_sel = SCR1_RD_WB_NONE;
+    idu2exu_cmd.rd_wb_y_addr = 'b0;
+    idu2exu_cmd.dla_cmd     = SCR1_DLA_CMD_NONE;
+    idu2exu_cmd.lsu_y_cmd   = SCR1_LSU_Y_CMD_NONE;
+`endif // SCR1_RVY_EXT
     // Clock gating
     idu2exu_use_rs1         = 1'b0;
     idu2exu_use_rs2         = 1'b0;
@@ -202,6 +208,30 @@ always_comb begin
 `endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_LOAD
 
+`ifdef SCR1_RVY_EXT
+
+                    SCR1_OPCODE_LOAD_Y            : begin
+                        idu2exu_use_rs1         = 1'b1;
+                        idu2exu_cmd.rd_wb_y_sel  = SCR1_RD_WB_LSU;
+                        idu2exu_cmd.rd_wb_y_addr = {instr[20], funct3, instr[11:7]};
+                        case (instr[22:21])
+                            2'b00   :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_NONE;
+                            2'b01   :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_FIVE_WORDS;
+                            2'b10   :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_THREE_WORDS;
+                            default :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_NONE;
+                        endcase
+
+`ifdef SCR1_RVE_EXT
+                        if (instr[11] | instr[19])  rve_illegal = 1'b1;
+`endif  // SCR1_RVE_EXT
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVI_LS;
+`endif  // SCR1_INSTR_SORT
+                    end // SCR1_OPCODE_LOAD_Y
+
+
+`endif  // SCR1_RVY_EXT
+
                     SCR1_OPCODE_STORE           : begin
                         idu2exu_use_rs1         = 1'b1;
                         idu2exu_use_rs2         = 1'b1;
@@ -221,6 +251,30 @@ always_comb begin
                         instr_sort              = SCR1_INSTR_SORT_RVI_LS;
 `endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_STORE
+
+//`ifdef SCR1_RVY_EXT
+//
+//                    SCR1_OPCODE_STORE_Y           : begin
+//                        idu2exu_use_rs1         = 1'b1;
+//                        idu2exu_use_rs2         = 1'b1;
+//                        idu2exu_use_imm         = 1'b1;
+//                        idu2exu_cmd.sum2_op     = SCR1_SUM2_OP_REG_IMM;
+//                        idu2exu_cmd.imm         = {{21{instr[31]}}, instr[30:25], instr[11:7]};
+//                        case (funct3)
+//                            3'b000  : idu2exu_cmd.lsu_cmd = SCR1_LSU_CMD_SB;
+//                            3'b001  : idu2exu_cmd.lsu_cmd = SCR1_LSU_CMD_SH;
+//                            3'b010  : idu2exu_cmd.lsu_cmd = SCR1_LSU_CMD_SW;
+//                            default : rvi_illegal = 1'b1;
+//                        endcase // funct3
+//`ifdef SCR1_RVE_EXT
+//                        if (instr[19] | instr[24])  rve_illegal = 1'b1;
+//`endif  // SCR1_RVE_EXT
+//`ifdef SCR1_INSTR_SORT
+//                        instr_sort              = SCR1_INSTR_SORT_RVI_LS;
+//`endif  // SCR1_INSTR_SORT
+//                    end // SCR1_OPCODE_STORE_Y
+//
+//`endif  // SCR1_RVY_EXT
 
                     SCR1_OPCODE_OP              : begin
                         idu2exu_use_rs1         = 1'b1;
@@ -272,6 +326,21 @@ always_comb begin
                         instr_sort              = SCR1_INSTR_SORT_RVI_CAL;
 `endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_OP
+
+`ifdef SCR1_RVY_EXT
+                    SCR1_OPCODE_OP_DLA          : begin
+                        idu2exu_use_rs1         = 1'b1;
+                        idu2exu_use_rs2         = 1'b1;
+                        idu2exu_use_imm         = 1'b1;
+                        idu2exu_cmd.imm         = {{25{instr[31]}}, instr[30:25]};
+                        case (funct3)
+                            3'b000  : idu2exu_cmd.dla_cmd = SCR1_DLA_CMD_NONE;
+                            3'b001  : idu2exu_cmd.dla_cmd = SCR1_DLA_CMD_CMAC;
+                            3'b010  : idu2exu_cmd.dla_cmd = SCR1_DLA_CMD_VINP;
+                            default : idu2exu_cmd.dla_cmd = SCR1_DLA_CMD_NONE;
+                        endcase
+                    end // SCR1_OPCODE_OP_Y
+`endif  // SCR1_RVY_EXT
 
                     SCR1_OPCODE_OP_IMM          : begin
                         idu2exu_use_rs1         = 1'b1;

@@ -21,6 +21,24 @@ typedef enum logic [1:0] {
 //-------------------------------------------------------------------------------
 // RV32I opcodes (bits 6:2)
 //-------------------------------------------------------------------------------
+`ifdef SCR1_RVY_EXT
+typedef enum logic [6:2] {
+    SCR1_OPCODE_LOAD        = 5'b00000,
+    SCR1_OPCODE_MISC_MEM    = 5'b00011,
+    SCR1_OPCODE_OP_IMM      = 5'b00100,
+    SCR1_OPCODE_AUIPC       = 5'b00101,
+    SCR1_OPCODE_STORE       = 5'b01000,
+    SCR1_OPCODE_OP          = 5'b01100,
+    SCR1_OPCODE_LUI         = 5'b01101,
+    SCR1_OPCODE_BRANCH      = 5'b11000,
+    SCR1_OPCODE_JALR        = 5'b11001,
+    SCR1_OPCODE_JAL         = 5'b11011,
+    SCR1_OPCODE_SYSTEM      = 5'b11100,
+    SCR1_OPCODE_LOAD_Y      = 5'b00001,
+    SCR1_OPCODE_STORE_Y     = 5'b01001,
+    SCR1_OPCODE_OP_DLA        = 5'b01110
+} type_scr1_rvi_opcode_e;
+`else
 typedef enum logic [6:2] {
     SCR1_OPCODE_LOAD        = 5'b00000,
     SCR1_OPCODE_MISC_MEM    = 5'b00011,
@@ -34,6 +52,8 @@ typedef enum logic [6:2] {
     SCR1_OPCODE_JAL         = 5'b11011,
     SCR1_OPCODE_SYSTEM      = 5'b11100
 } type_scr1_rvi_opcode_e;
+`endif   // SCR1_RVY_EXT
+
 
 
 //-------------------------------------------------------------------------------
@@ -82,6 +102,10 @@ typedef enum logic [SCR1_IALU_CMD_WIDTH_E-1:0] {
     SCR1_IALU_CMD_REM,          // op1 % op2
     SCR1_IALU_CMD_REMU          // op1 u% op2
 `endif  // SCR1_RVM_EXT
+`ifdef SCR1_RVY_EXT
+    ,
+    SCR1_IALU_CMD_CMAC          // *(op1) inner product with *(op2)
+`endif  // SCR1_RVY_EXT
 } type_scr1_ialu_cmd_sel_e;
 
 //-------------------------------------------------------------------------------
@@ -112,6 +136,21 @@ typedef enum logic [SCR1_LSU_CMD_WIDTH_E-1:0] {
     SCR1_LSU_CMD_SW
 } type_scr1_lsu_cmd_sel_e;
 
+
+
+//-------------------------------------------------------------------------------
+// LSU Highspeed commands
+//-------------------------------------------------------------------------------
+`ifdef SCR1_RVY_EXT
+localparam SCR1_LSU_Y_CMD_ALL_NUM_E   = 3;
+localparam SCR1_LSU_Y_CMD_WIDTH_E     = $clog2(SCR1_LSU_Y_CMD_ALL_NUM_E);
+typedef enum logic [SCR1_LSU_CMD_WIDTH_E-1:0] {
+    SCR1_LSU_Y_CMD_NONE = '0,
+    SCR1_LSU_Y_CMD_FIVE_WORDS,
+    SCR1_LSU_Y_CMD_THREE_WORDS
+} type_scr1_lsu_y_cmd_sel_e;
+`endif  // SCR1_RVY_EXT
+
 //-------------------------------------------------------------------------------
 // CSR operands
 //-------------------------------------------------------------------------------
@@ -133,6 +172,19 @@ typedef enum logic [SCR1_CSR_CMD_WIDTH_E-1:0] {
     SCR1_CSR_CMD_SET,
     SCR1_CSR_CMD_CLEAR
 } type_scr1_csr_cmd_sel_e;
+
+//-------------------------------------------------------------------------------
+// DLA commands
+//-------------------------------------------------------------------------------
+`ifdef SCR1_RVY_EXT
+localparam SCR1_DLA_CMD_ALL_NUM_E   = 3;
+localparam SCR1_DLA_CMD_WIDTH_E     = $clog2(SCR1_DLA_CMD_ALL_NUM_E);
+typedef enum logic [SCR1_DLA_CMD_WIDTH_E-1:0] {
+    SCR1_DLA_CMD_NONE = '0,
+    SCR1_DLA_CMD_CMAC,
+    SCR1_DLA_CMD_VINP
+} type_scr1_dla_cmd_sel_e;
+`endif  // SCR1_RVY_EXT
 
 //-------------------------------------------------------------------------------
 // MPRF rd writeback source
@@ -163,6 +215,12 @@ typedef struct packed {
     type_scr1_csr_op_sel_e              csr_op;
     type_scr1_csr_cmd_sel_e             csr_cmd;
     type_scr1_rd_wb_sel_e               rd_wb_sel;
+`ifdef SCR1_RVY_EXT
+    type_scr1_rd_wb_sel_e               rd_wb_y_sel;
+    logic [8:0]                         rd_wb_y_addr;
+    type_scr1_dla_cmd_sel_e             dla_cmd;
+    type_scr1_lsu_y_cmd_sel_e           lsu_y_cmd;
+`endif  // SCR1_RVY_EXT
     logic                               jump_req;
     logic                               branch_req;
     logic                               mret_req;

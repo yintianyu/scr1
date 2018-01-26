@@ -1,3 +1,5 @@
+`ifndef LENET_DEFINE_SVH
+`define LENET_DEFINE_SVH
 `define EOF                             32'HFFFF_FFFF
 `define CONV1_WEIGHT                    150 //6 * 25
 `define CONV1_BIAS                      6
@@ -31,3 +33,5 @@
 
 `define ADDRESS_MNIST_FEATURE           (`ADDRESS_DENSE8_BIAS + `SIZE_DATA * `DENSE8_BIAS)
 `define ADDRESS_MNIST_LABEL             (`ADDRESS_MNIST_FEATURE + `SIZE_DATA * `FEATURE_SIZE * `FEATURE_QUANTITY)
+
+`endif // ~LENET_DEFINE_SVH

@@ -9,6 +9,10 @@
 `include "scr1_ipic.svh"
 `endif // SCR1_IPIC_EN
 
+`ifdef SCR1_RVY_EXT
+`include "ytydla_define.svh"
+`endif // SCR1_RVY_EXT
+
 `ifdef SCR1_TCM_EN
  `define SCR1_IMEM_ROUTER_EN
 `endif // SCR1_TCM_EN
@@ -88,6 +92,55 @@ module scr1_top_axi (
     input   logic                                   io_axi_imem_rvalid,
     output  logic                                   io_axi_imem_rready,
 
+`ifdef SCR1_RVY_EXT
+    // Data Memory Interface
+    output  logic [3:0]                             io_axi_dmem_y_awid,
+    output  logic [31:0]                            io_axi_dmem_y_awaddr,
+    output  logic [7:0]                             io_axi_dmem_y_awlen,
+    output  logic [2:0]                             io_axi_dmem_y_awsize,
+    output  logic [1:0]                             io_axi_dmem_y_awburst,
+    output  logic                                   io_axi_dmem_y_awlock,
+    output  logic [3:0]                             io_axi_dmem_y_awcache,
+    output  logic [2:0]                             io_axi_dmem_y_awprot,
+    output  logic [3:0]                             io_axi_dmem_y_awregion,
+    output  logic [3:0]                             io_axi_dmem_y_awuser,
+    output  logic [3:0]                             io_axi_dmem_y_awqos,
+    output  logic                                   io_axi_dmem_y_awvalid,
+    input   logic                                   io_axi_dmem_y_awready,
+    output  logic [`YTYDLA_LSU_WIDTH-1:0]           io_axi_dmem_y_wdata,
+    output  logic [3:0]                             io_axi_dmem_y_wstrb,
+    output  logic                                   io_axi_dmem_y_wlast,
+    output  logic [3:0]                             io_axi_dmem_y_wuser,
+    output  logic                                   io_axi_dmem_y_wvalid,
+    input   logic                                   io_axi_dmem_y_wready,
+    input   logic [3:0]                             io_axi_dmem_y_bid,
+    input   logic [1:0]                             io_axi_dmem_y_bresp,
+    input   logic                                   io_axi_dmem_y_bvalid,
+    input   logic [3:0]                             io_axi_dmem_y_buser,
+    output  logic                                   io_axi_dmem_y_bready,
+    output  logic [3:0]                             io_axi_dmem_y_arid,
+    output  logic [31:0]                            io_axi_dmem_y_araddr,
+    output  logic [7:0]                             io_axi_dmem_y_arlen,
+    output  logic [2:0]                             io_axi_dmem_y_arsize,
+    output  logic [1:0]                             io_axi_dmem_y_arburst,
+    output  logic                                   io_axi_dmem_y_arlock,
+    output  logic [3:0]                             io_axi_dmem_y_arcache,
+    output  logic [2:0]                             io_axi_dmem_y_arprot,
+    output  logic [3:0]                             io_axi_dmem_y_arregion,
+    output  logic [3:0]                             io_axi_dmem_y_aruser,
+    output  logic [3:0]                             io_axi_dmem_y_arqos,
+    output  logic                                   io_axi_dmem_y_arvalid,
+    input   logic                                   io_axi_dmem_y_arready,
+    input   logic [3:0]                             io_axi_dmem_y_rid,
+    input   logic [`YTYDLA_LSU_WIDTH-1:0]           io_axi_dmem_y_rdata,
+    input   logic [1:0]                             io_axi_dmem_y_rresp,
+    input   logic                                   io_axi_dmem_y_rlast,
+    input   logic [3:0]                             io_axi_dmem_y_ruser,
+    input   logic                                   io_axi_dmem_y_rvalid,
+    output  logic                                   io_axi_dmem_y_rready,
+`endif // SCR1_RVY_EXT
+
+
     // Data Memory Interface
     output  logic [3:0]                             io_axi_dmem_awid,
     output  logic [31:0]                            io_axi_dmem_awaddr,
@@ -147,6 +200,19 @@ logic [`SCR1_IMEM_AWIDTH-1:0]                       core_imem_addr;
 logic [`SCR1_IMEM_DWIDTH-1:0]                       core_imem_rdata;
 type_scr1_mem_resp_e                                core_imem_resp;
 
+
+`ifdef SCR1_RVY_EXT
+// High speed data memory interface from core to router
+logic                                               core_dmem_y_req_ack;
+logic                                               core_dmem_y_req;
+type_scr1_mem_cmd_e                                 core_dmem_y_cmd;
+type_scr1_mem_y_width_e                               core_dmem_y_width;
+logic [`SCR1_DMEM_AWIDTH-1:0]                       core_dmem_y_addr;
+logic [`YTYDLA_LSU_WIDTH-1:0]                       core_dmem_y_wdata;
+logic [`YTYDLA_LSU_WIDTH-1:0]                       core_dmem_y_rdata;
+type_scr1_mem_resp_e                                core_dmem_y_resp;
+`endif // SCR1_RVY_EXT
+
 // Data memory interface from core to router
 logic                                               core_dmem_req_ack;
 logic                                               core_dmem_req;
@@ -174,6 +240,18 @@ logic [`SCR1_DMEM_AWIDTH-1:0]                       axi_dmem_addr;
 logic [`SCR1_DMEM_DWIDTH-1:0]                       axi_dmem_wdata;
 logic [`SCR1_DMEM_DWIDTH-1:0]                       axi_dmem_rdata;
 type_scr1_mem_resp_e                                axi_dmem_resp;
+
+`ifdef SCR1_RVY_EXT
+// Highspeed data memory interface from router to AXI bridge
+logic                                               axi_dmem_y_req_ack;
+logic                                               axi_dmem_y_req;
+type_scr1_mem_cmd_e                                 axi_dmem_y_cmd;
+type_scr1_mem_y_width_e                               axi_dmem_y_width;
+logic [`SCR1_DMEM_AWIDTH-1:0]                       axi_dmem_y_addr;
+logic [`YTYDLA_LSU_WIDTH-1:0]                       axi_dmem_y_wdata;
+logic [`YTYDLA_LSU_WIDTH-1:0]                       axi_dmem_y_rdata;
+type_scr1_mem_resp_e                                axi_dmem_y_resp;
+`endif // SCR1_RVY_EXT
 
 `ifdef SCR1_TCM_EN
 // Instruction memory interface from router to TCM
@@ -211,6 +289,9 @@ logic [63:0]                                        timer_val;
 logic                                               axi_reinit;
 logic                                               axi_imem_idle;
 logic                                               axi_dmem_idle;
+`ifdef SCR1_RVY_EXT
+logic                                               axi_dmem_y_idle;
+`endif // SCR1_RVY_EXT
 
 //-------------------------------------------------------------------------------
 // SCR1 core instance
@@ -247,6 +328,19 @@ scr1_core_top i_core_top (
     .imem_addr      (core_imem_addr     ),
     .imem_rdata     (core_imem_rdata    ),
     .imem_resp      (core_imem_resp     ),
+
+`ifdef SCR1_RVY_EXT
+    // Data memory interface
+    .dmem_y_req_ack   (core_dmem_y_req_ack  ),
+    .dmem_y_req       (core_dmem_y_req      ),
+    .dmem_y_cmd       (core_dmem_y_cmd      ),
+    .dmem_y_width     (core_dmem_y_width    ),
+    .dmem_y_addr      (core_dmem_y_addr     ),
+    .dmem_y_wdata     (core_dmem_y_wdata    ),
+    .dmem_y_rdata     (core_dmem_y_rdata    ),
+    .dmem_y_resp      (core_dmem_y_resp     ),
+`endif // SCR1_RVY_EXT
+
     // Data memory interface
     .dmem_req_ack   (core_dmem_req_ack  ),
     .dmem_req       (core_dmem_req      ),
@@ -425,6 +519,36 @@ scr1_dmem_router #(
 );
 
 
+`ifdef SCR1_RVY_EXT
+//-------------------------------------------------------------------------------
+// Data memory router highspeed
+//-------------------------------------------------------------------------------
+scr1_dmem_router_highspeed i_dmem_y_router(
+    .clk            (clk                ),
+    .rst_n          (rst_n              ),
+    // Interface to core
+    .dmem_req_ack   (core_dmem_y_req_ack  ),
+    .dmem_req       (core_dmem_y_req      ),
+    .dmem_cmd       (core_dmem_y_cmd      ),
+    .dmem_width     (core_dmem_y_width    ),
+    .dmem_addr      (core_dmem_y_addr     ),
+    .dmem_wdata     (core_dmem_y_wdata    ),
+    .dmem_rdata     (core_dmem_y_rdata    ),
+    .dmem_resp      (core_dmem_y_resp     ),
+    // Interface to AXI bridge
+    .port0_req_ack    (axi_dmem_y_req_ack   ),
+    .port0_req        (axi_dmem_y_req       ),
+    .port0_cmd        (axi_dmem_y_cmd       ),
+    .port0_width      (axi_dmem_y_width     ),
+    .port0_addr       (axi_dmem_y_addr      ),
+    .port0_wdata      (axi_dmem_y_wdata     ),
+    .port0_rdata      (axi_dmem_y_rdata     ),
+    .port0_resp       (axi_dmem_y_resp      )
+    );
+
+`endif // SCR1_RVY_EXT
+
+
 //-------------------------------------------------------------------------------
 // Instruction memory AXI bridge
 //-------------------------------------------------------------------------------
@@ -435,10 +559,11 @@ scr1_mem_axi #(
     .SCR1_AXI_REQ_BP    (0),
 `endif // SCR1_IMEM_AXI_REQ_BP
 `ifdef SCR1_IMEM_AXI_RESP_BP
-    .SCR1_AXI_RESP_BP   (1)
+    .SCR1_AXI_RESP_BP   (1),
 `else // SCR1_IMEM_AXI_RESP_BP
-    .SCR1_AXI_RESP_BP   (0)
+    .SCR1_AXI_RESP_BP   (0),
 `endif // SCR1_IMEM_AXI_RESP_BP
+    .SCR1_DATA_WIDTH    (32)
 ) i_imem_axi (
     .clk            (clk                    ),
     .rst_n          (rst_n                  ),
@@ -499,6 +624,85 @@ scr1_mem_axi #(
     .rvalid         (io_axi_imem_rvalid     ),
     .rready         (io_axi_imem_rready     )
 );
+
+`ifdef SCR1_RVY_EXT
+//-------------------------------------------------------------------------------
+// High Speed data memory AXI bridge
+//-------------------------------------------------------------------------------
+scr1_mem_axi_highspeed #(
+`ifdef SCR1_DMEM_AXI_REQ_BP
+    .SCR1_AXI_REQ_BP    (1),
+`else // SCR1_DMEM_AXI_REQ_BP
+    .SCR1_AXI_REQ_BP    (0),
+`endif // SCR1_DMEM_AXI_REQ_BP
+`ifdef SCR1_DMEM_AXI_RESP_BP
+    .SCR1_AXI_RESP_BP   (1),
+`else // SCR1_DMEM_AXI_RESP_BP
+    .SCR1_AXI_RESP_BP   (0),
+`endif // SCR1_DMEM_AXI_RESP_BP
+    .SCR1_DATA_WIDTH    (`YTYDLA_LSU_WIDTH)
+) i_dmem_y_axi (
+    .clk            (clk                    ),
+    .rst_n          (rst_n                  ),
+    .axi_reinit     (axi_reinit             ),
+    // Interface to core
+    .core_idle      (axi_dmem_y_idle          ),
+    .core_req_ack   (axi_dmem_y_req_ack       ),
+    .core_req       (axi_dmem_y_req           ),
+    .core_cmd       (axi_dmem_y_cmd           ),
+    .core_width     (axi_dmem_y_width         ),
+    .core_addr      (axi_dmem_y_addr          ),
+    .core_wdata     (axi_dmem_y_wdata         ),
+    .core_rdata     (axi_dmem_y_rdata         ),
+    .core_resp      (axi_dmem_y_resp          ),
+    // AXI I/O
+    .awid           (io_axi_dmem_y_awid       ),
+    .awaddr         (io_axi_dmem_y_awaddr     ),
+    .awlen          (io_axi_dmem_y_awlen      ),
+    .awsize         (io_axi_dmem_y_awsize     ),
+    .awburst        (io_axi_dmem_y_awburst    ),
+    .awlock         (io_axi_dmem_y_awlock     ),
+    .awcache        (io_axi_dmem_y_awcache    ),
+    .awprot         (io_axi_dmem_y_awprot     ),
+    .awregion       (io_axi_dmem_y_awregion   ),
+    .awuser         (io_axi_dmem_y_awuser     ),
+    .awqos          (io_axi_dmem_y_awqos      ),
+    .awvalid        (io_axi_dmem_y_awvalid    ),
+    .awready        (io_axi_dmem_y_awready    ),
+    .wdata          (io_axi_dmem_y_wdata      ),
+    .wstrb          (io_axi_dmem_y_wstrb      ),
+    .wlast          (io_axi_dmem_y_wlast      ),
+    .wuser          (io_axi_dmem_y_wuser      ),
+    .wvalid         (io_axi_dmem_y_wvalid     ),
+    .wready         (io_axi_dmem_y_wready     ),
+    .bid            (io_axi_dmem_y_bid        ),
+    .bresp          (io_axi_dmem_y_bresp      ),
+    .bvalid         (io_axi_dmem_y_bvalid     ),
+    .buser          (io_axi_dmem_y_buser      ),
+    .bready         (io_axi_dmem_y_bready     ),
+    .arid           (io_axi_dmem_y_arid       ),
+    .araddr         (io_axi_dmem_y_araddr     ),
+    .arlen          (io_axi_dmem_y_arlen      ),
+    .arsize         (io_axi_dmem_y_arsize     ),
+    .arburst        (io_axi_dmem_y_arburst    ),
+    .arlock         (io_axi_dmem_y_arlock     ),
+    .arcache        (io_axi_dmem_y_arcache    ),
+    .arprot         (io_axi_dmem_y_arprot     ),
+    .arregion       (io_axi_dmem_y_arregion   ),
+    .aruser         (io_axi_dmem_y_aruser     ),
+    .arqos          (io_axi_dmem_y_arqos      ),
+    .arvalid        (io_axi_dmem_y_arvalid    ),
+    .arready        (io_axi_dmem_y_arready    ),
+    .rid            (io_axi_dmem_y_rid        ),
+    .rdata          (io_axi_dmem_y_rdata      ),
+    .rresp          (io_axi_dmem_y_rresp      ),
+    .rlast          (io_axi_dmem_y_rlast      ),
+    .ruser          (io_axi_dmem_y_ruser      ),
+    .rvalid         (io_axi_dmem_y_rvalid     ),
+    .rready         (io_axi_dmem_y_rready     )
+);
+`endif // SCR1_RVY_EXT
+
 
 
 //-------------------------------------------------------------------------------
@@ -581,7 +785,7 @@ scr1_mem_axi #(
 //-------------------------------------------------------------------------------
 always_ff @(negedge rst_n_out, posedge clk) begin
     if (~rst_n_out)                             axi_reinit <= 1'b1;
-    else if (axi_imem_idle & axi_dmem_idle)     axi_reinit <= 1'b0;
+    else if (axi_imem_idle & axi_dmem_idle & axi_dmem_y_idle)     axi_reinit <= 1'b0;
 end
 
 endmodule : scr1_top_axi

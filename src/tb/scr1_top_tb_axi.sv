@@ -8,6 +8,10 @@
 `include "scr1_ipic.svh"
 `endif // SCR1_IPIC_EN
 
+`ifdef SCR1_RVY_EXT
+`include "ytydla_define.svh"
+`endif // SCR1_RVY_EXT
+
 module scr1_top_tb_axi ();
 
 //------------------------------------------------------------------------------
@@ -126,10 +130,60 @@ logic [3:0]                             io_axi_dmem_ruser;
 logic                                   io_axi_dmem_rvalid;
 logic                                   io_axi_dmem_rready;
 
+`ifdef SCR1_RVY_EXT
+// Highspeed Data Memory
+logic [3:0]                             io_axi_dmem_y_awid;
+logic [31:0]                            io_axi_dmem_y_awaddr;
+logic [7:0]                             io_axi_dmem_y_awlen;
+logic [2:0]                             io_axi_dmem_y_awsize;
+logic [1:0]                             io_axi_dmem_y_awburst;
+logic                                   io_axi_dmem_y_awlock;
+logic [3:0]                             io_axi_dmem_y_awcache;
+logic [2:0]                             io_axi_dmem_y_awprot;
+logic [3:0]                             io_axi_dmem_y_awregion;
+logic [3:0]                             io_axi_dmem_y_awuser;
+logic [3:0]                             io_axi_dmem_y_awqos;
+logic                                   io_axi_dmem_y_awvalid;
+logic                                   io_axi_dmem_y_awready;
+logic[`YTYDLA_LSU_WIDTH-1:0]            io_axi_dmem_y_wdata;
+logic [3:0]                             io_axi_dmem_y_wstrb;
+logic                                   io_axi_dmem_y_wlast;
+logic [3:0]                             io_axi_dmem_y_wuser;
+logic                                   io_axi_dmem_y_wvalid;
+logic                                   io_axi_dmem_y_wready;
+logic [3:0]                             io_axi_dmem_y_bid;
+logic [1:0]                             io_axi_dmem_y_bresp;
+logic                                   io_axi_dmem_y_bvalid;
+logic [3:0]                             io_axi_dmem_y_buser;
+logic                                   io_axi_dmem_y_bready;
+logic [3:0]                             io_axi_dmem_y_arid;
+logic [31:0]                            io_axi_dmem_y_araddr;
+logic [7:0]                             io_axi_dmem_y_arlen;
+logic [2:0]                             io_axi_dmem_y_arsize;
+logic [1:0]                             io_axi_dmem_y_arburst;
+logic                                   io_axi_dmem_y_arlock;
+logic [3:0]                             io_axi_dmem_y_arcache;
+logic [2:0]                             io_axi_dmem_y_arprot;
+logic [3:0]                             io_axi_dmem_y_arregion;
+logic [3:0]                             io_axi_dmem_y_aruser;
+logic [3:0]                             io_axi_dmem_y_arqos;
+logic                                   io_axi_dmem_y_arvalid;
+logic                                   io_axi_dmem_y_arready;
+logic [3:0]                             io_axi_dmem_y_rid;
+logic [`YTYDLA_LSU_WIDTH-1:0]           io_axi_dmem_y_rdata;
+logic [1:0]                             io_axi_dmem_y_rresp;
+logic                                   io_axi_dmem_y_rlast;
+logic [3:0]                             io_axi_dmem_y_ruser;
+logic                                   io_axi_dmem_y_rvalid;
+logic                                   io_axi_dmem_y_rready;
+`endif // SCR1_RVY_EXT
+
 int unsigned                            f_results;
 int unsigned                            f_info;
 string                                  s_results;
 string                                  s_info;
+
+logic[80 * 8:1]							filename_memory;
 
 int unsigned                            tests_passed;
 int unsigned                            tests_total;
@@ -170,6 +224,11 @@ initial begin
 
     f_info      = $fopen(s_info, "r");
     f_results   = $fopen(s_results, "a");
+
+    filename_memory = "./data/memory.lists";
+
+
+    $readmemh(filename_memory, i_memory_tb.memory);
 
     forever begin
         if ($feof(f_info)) break;
@@ -279,6 +338,54 @@ scr1_top_axi i_top (
     .io_axi_imem_rvalid     (io_axi_imem_rvalid     ),
     .io_axi_imem_rready     (io_axi_imem_rready     ),
 
+`ifdef SCR1_RVY_EXT
+    // High Speed data memory
+    .io_axi_dmem_y_awid       (io_axi_dmem_y_awid       ),
+    .io_axi_dmem_y_awaddr     (io_axi_dmem_y_awaddr     ),
+    .io_axi_dmem_y_awlen      (io_axi_dmem_y_awlen      ),
+    .io_axi_dmem_y_awsize     (io_axi_dmem_y_awsize     ),
+    .io_axi_dmem_y_awburst    (),
+    .io_axi_dmem_y_awlock     (),
+    .io_axi_dmem_y_awcache    (),
+    .io_axi_dmem_y_awprot     (),
+    .io_axi_dmem_y_awregion   (),
+    .io_axi_dmem_y_awuser     (),
+    .io_axi_dmem_y_awqos      (),
+    .io_axi_dmem_y_awvalid    (io_axi_dmem_y_awvalid    ),
+    .io_axi_dmem_y_awready    (io_axi_dmem_y_awready    ),
+    .io_axi_dmem_y_wdata      (io_axi_dmem_y_wdata      ),
+    .io_axi_dmem_y_wstrb      (io_axi_dmem_y_wstrb      ),
+    .io_axi_dmem_y_wlast      (io_axi_dmem_y_wlast      ),
+    .io_axi_dmem_y_wuser      (),
+    .io_axi_dmem_y_wvalid     (io_axi_dmem_y_wvalid     ),
+    .io_axi_dmem_y_wready     (io_axi_dmem_y_wready     ),
+    .io_axi_dmem_y_bid        (io_axi_dmem_y_bid        ),
+    .io_axi_dmem_y_bresp      (io_axi_dmem_y_bresp      ),
+    .io_axi_dmem_y_bvalid     (io_axi_dmem_y_bvalid     ),
+    .io_axi_dmem_y_buser      (4'd0                   ),
+    .io_axi_dmem_y_bready     (io_axi_dmem_y_bready     ),
+    .io_axi_dmem_y_arid       (io_axi_dmem_y_arid       ),
+    .io_axi_dmem_y_araddr     (io_axi_dmem_y_araddr     ),
+    .io_axi_dmem_y_arlen      (io_axi_dmem_y_arlen      ),
+    .io_axi_dmem_y_arsize     (io_axi_dmem_y_arsize     ),
+    .io_axi_dmem_y_arburst    (io_axi_dmem_y_arburst    ),
+    .io_axi_dmem_y_arlock     (),
+    .io_axi_dmem_y_arcache    (),
+    .io_axi_dmem_y_arprot     (),
+    .io_axi_dmem_y_arregion   (),
+    .io_axi_dmem_y_aruser     (),
+    .io_axi_dmem_y_arqos      (),
+    .io_axi_dmem_y_arvalid    (io_axi_dmem_y_arvalid    ),
+    .io_axi_dmem_y_arready    (io_axi_dmem_y_arready    ),
+    .io_axi_dmem_y_rid        (io_axi_dmem_y_rid        ),
+    .io_axi_dmem_y_rdata      (io_axi_dmem_y_rdata      ),
+    .io_axi_dmem_y_rresp      (io_axi_dmem_y_rresp      ),
+    .io_axi_dmem_y_rlast      (io_axi_dmem_y_rlast      ),
+    .io_axi_dmem_y_ruser      (4'd0                   ),
+    .io_axi_dmem_y_rvalid     (io_axi_dmem_y_rvalid     ),
+    .io_axi_dmem_y_rready     (io_axi_dmem_y_rready     ),
+`endif // SCR1_RVY_EXT
+
     // Data memory
     .io_axi_dmem_awid       (io_axi_dmem_awid       ),
     .io_axi_dmem_awaddr     (io_axi_dmem_awaddr     ),
@@ -330,7 +437,7 @@ scr1_top_axi i_top (
 // Memory instance
 //-------------------------------------------------------------------------------
 scr1_memory_tb_axi #(
-    .SIZE    (1*1024*1024 ),
+    .SIZE    (1*1024*1024*16 ),
     .N_IF    (2           ),
     .W_ADR   (32          ),
     .W_DATA  (32          )
@@ -340,6 +447,46 @@ scr1_memory_tb_axi #(
     // System
     .rst_n          (rst_n),
     .clk            (clk),
+
+`ifdef SCR1_RVY_EXT
+    // Write address channel
+    .y_awid           ( io_axi_dmem_y_awid      ),
+    .y_awaddr         ( io_axi_dmem_y_awaddr    ),
+    .y_awsize         ( io_axi_dmem_y_awsize    ),
+    .y_awlen          ( io_axi_dmem_y_awlen     ),
+    .y_awvalid        ( io_axi_dmem_y_awvalid   ),
+    .y_awready        ( io_axi_dmem_y_awready   ),
+
+    // Write data channel
+    .y_wdata          ( io_axi_dmem_y_wdata     ),
+    .y_wstrb          ( io_axi_dmem_y_wstrb     ),
+    .y_wvalid         ( io_axi_dmem_y_wvalid    ),
+    .y_wlast          ( io_axi_dmem_y_wlast     ),
+    .y_wready         ( io_axi_dmem_y_wready    ),
+
+    // Write response channel
+    .y_bready         ( io_axi_dmem_y_bready    ),
+    .y_bvalid         ( io_axi_dmem_y_bvalid    ),
+    .y_bid            ( io_axi_dmem_y_bid       ),
+    .y_bresp          ( io_axi_dmem_y_bresp     ),
+
+    // Read address channel
+    .y_arid           ( io_axi_dmem_y_arid      ),
+    .y_araddr         ( io_axi_dmem_y_araddr    ),
+    .y_arburst        ( io_axi_dmem_y_arburst   ),
+    .y_arsize         ( io_axi_dmem_y_arsize    ),
+    .y_arlen          ( io_axi_dmem_y_arlen     ),
+    .y_arvalid        ( io_axi_dmem_y_arvalid   ),
+    .y_arready        ( io_axi_dmem_y_arready   ),
+
+    // Read data channel
+    .y_rvalid         ( io_axi_dmem_y_rvalid    ),
+    .y_rready         ( io_axi_dmem_y_rready    ),
+    .y_rid            ( io_axi_dmem_y_rid       ),
+    .y_rdata          ( io_axi_dmem_y_rdata     ),
+    .y_rlast          ( io_axi_dmem_y_rlast     ),
+    .y_rresp          ( io_axi_dmem_y_rresp     ),
+`endif // SCR1_RVY_EXT
 
     // Write address channel
     .awid           ( {io_axi_imem_awid,   io_axi_dmem_awid}      ),

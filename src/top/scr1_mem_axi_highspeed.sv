@@ -1,3 +1,4 @@
+
 /// Copyright by Syntacore LLC © 2016, 2017. See LICENSE for details
 /// @file       <scr1_mem_axi.sv>
 /// @brief      Memory AXI bridge
@@ -6,14 +7,18 @@
 `include "scr1_memif.svh"
 `include "scr1_arch_description.svh"
 
-module scr1_mem_axi
+`ifdef SCR1_RVY_EXT
+`include "ytydla_define.svh"
+`endif // SCR1_RVY_EXT
+
+module scr1_mem_axi_highspeed
 #(
     parameter SCR1_REQ_BUF_SIZE     = 2,                    // Power of 2 value
     parameter SCR1_AXI_IDWIDTH      = 4,
     parameter SCR1_ADDR_WIDTH       = 32,
     parameter SCR1_AXI_REQ_BP       = 1,
     parameter SCR1_AXI_RESP_BP      = 1,
-    parameter SCR1_DATA_WIDTH       = 32
+    parameter SCR1_DATA_WIDTH       = `YTYDLA_LSU_WIDTH
 )
 (
     // Clock and Reset
@@ -25,10 +30,10 @@ module scr1_mem_axi
     output  logic                           core_req_ack,
     input   logic                           core_req,
     input   type_scr1_mem_cmd_e             core_cmd,
-    input   type_scr1_mem_width_e           core_width,
+    input   type_scr1_mem_y_width_e         core_width,
     input   logic [SCR1_ADDR_WIDTH-1:0]     core_addr,
-    input   logic [31:0]                    core_wdata,
-    output  logic [31:0]                    core_rdata,
+    input   logic [SCR1_DATA_WIDTH-1:0]     core_wdata,
+    output  logic [SCR1_DATA_WIDTH-1:0]     core_rdata,
     output  type_scr1_mem_resp_e            core_resp,
 
     // AXI
@@ -81,14 +86,13 @@ module scr1_mem_axi
 
 // Local functions
 function automatic logic [2:0] width2axsize (
-    input   type_scr1_mem_width_e    width );
+    input   type_scr1_mem_y_width_e    width );
     logic [2:0] axsize;
 begin
     case (width)
-        SCR1_MEM_WIDTH_BYTE :  axsize = 3'b000;
-        SCR1_MEM_WIDTH_HWORD:  axsize = 3'b001;
-        SCR1_MEM_WIDTH_WORD :  axsize = 3'b010;
-                     default:  axsize = 'x;
+        SCR1_MEM_Y_WIDTH_FIVE_WORD :         axsize = 3'b101;
+        SCR1_MEM_Y_WIDTH_THREE_WORD:         axsize = 3'b011;
+        default:  axsize = 'x;
     endcase
 
     return axsize;
@@ -96,7 +100,7 @@ end
 endfunction: width2axsize
 
 typedef struct packed {
-    type_scr1_mem_width_e                               axi_width;
+    type_scr1_mem_y_width_e                             axi_width;
     logic                    [SCR1_ADDR_WIDTH-1:0]      axi_addr;
     logic                                   [31:0]      axi_wdata;
 } type_scr1_request_s;
@@ -115,7 +119,7 @@ logic               [$clog2(SCR1_REQ_BUF_SIZE)-1:0]     req_aval_ptr;
 logic               [$clog2(SCR1_REQ_BUF_SIZE)-1:0]     req_proc_ptr;
 logic               [$clog2(SCR1_REQ_BUF_SIZE)-1:0]     req_done_ptr;
 logic                                                   rresp_err;
-logic                                       [31:0]      rcvd_rdata;
+logic                         [SCR1_DATA_WIDTH-1:0]     rcvd_rdata;
 type_scr1_mem_resp_e                                    rcvd_resp;
 logic                                                   force_read;
 logic                                                   force_write;
@@ -234,19 +238,9 @@ end
 // Write data signals adaptation
 always_comb begin
     if (force_write)
-        case (core_width)
-            SCR1_MEM_WIDTH_BYTE :  wstrb = 4'h1 << core_addr[1:0];
-            SCR1_MEM_WIDTH_HWORD:  wstrb = 4'h3 << core_addr[1:0];
-            SCR1_MEM_WIDTH_WORD :  wstrb = 4'hf << core_addr[1:0];
-                         default:  wstrb = 'x;
-        endcase
+        wstrb = 4'h1 << core_addr[1:0];
     else
-        case (req_fifo[req_proc_ptr].axi_width)
-            SCR1_MEM_WIDTH_BYTE :  wstrb = 4'h1 << req_fifo[req_proc_ptr].axi_addr[1:0];
-            SCR1_MEM_WIDTH_HWORD:  wstrb = 4'h3 << req_fifo[req_proc_ptr].axi_addr[1:0];
-            SCR1_MEM_WIDTH_WORD :  wstrb = 4'hf << req_fifo[req_proc_ptr].axi_addr[1:0];
-                         default:  wstrb = 'x;
-        endcase
+        wstrb = 4'h1 << req_fifo[req_proc_ptr].axi_addr[1:0];
 end
 
 
@@ -257,12 +251,7 @@ assign wdata = (force_write)?                       core_wdata << (8*           
 
 // Read data adaptation
 always_comb begin
-    case (req_fifo[req_done_ptr].axi_width)
-        SCR1_MEM_WIDTH_BYTE :  rcvd_rdata = rdata >> (8*req_fifo[req_done_ptr].axi_addr[1:0]);
-        SCR1_MEM_WIDTH_HWORD:  rcvd_rdata = rdata >> (8*req_fifo[req_done_ptr].axi_addr[1:0]);
-        SCR1_MEM_WIDTH_WORD :  rcvd_rdata = rdata >> (8*req_fifo[req_done_ptr].axi_addr[1:0]);
-                     default:  rcvd_rdata = 'x;
-    endcase
+    rcvd_rdata = rdata;
 end
 
 
@@ -286,7 +275,7 @@ endgenerate
 // AXI interface assignments
 assign awid     = SCR1_AXI_IDWIDTH'(1);
 assign awlen    = 8'd0;
-assign awsize   = (force_write) ? width2axsize(core_width) : width2axsize(req_fifo[req_proc_ptr].axi_width);
+assign awsize   = 'b0;
 assign awburst  = 2'd1;
 assign awcache  = 4'd2;
 assign awlock   = '0;
@@ -326,4 +315,4 @@ SCR1_SVA_AXI_X_CHECK3  : assert property (@(negedge clk) disable iff (~rst_n)   
                                                                                                         else $error("AXI bridge: X state on input");
 `endif // SCR1_SIM_ENV
 
-endmodule : scr1_mem_axi
+endmodule : scr1_mem_axi_highspeed

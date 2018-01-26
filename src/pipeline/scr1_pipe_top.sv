@@ -8,6 +8,10 @@
 `include "scr1_riscv_isa_decoding.svh"
 `include "scr1_csr.svh"
 
+`ifdef SCR1_RVY_EXT
+`include "ytydla_define.svh"
+`endif // SCR1_RVY_EXT
+
 `ifdef SCR1_IPIC_EN
 `include "scr1_ipic.svh"
 `endif // SCR1_IPIC_EN
@@ -42,6 +46,18 @@ module scr1_pipe_top (
     input   logic                                       dmem_req_ack,
     input   logic [`SCR1_DMEM_DWIDTH-1:0]               dmem_rdata,
     input   type_scr1_mem_resp_e                        dmem_resp,
+
+`ifdef SCR1_RVY_EXT
+    // Data Memory at High Speed Interface
+    output  logic                                       dmem_y_req,
+    output  type_scr1_mem_cmd_e                         dmem_y_cmd,
+    output  type_scr1_mem_y_width_e                     dmem_y_width,
+    output  logic [`SCR1_DMEM_AWIDTH-1:0]               dmem_y_addr,
+    output  logic [`YTYDLA_LSU_WIDTH-1:0]               dmem_y_wdata,
+    input   logic                                       dmem_y_req_ack,
+    input   logic [`YTYDLA_LSU_WIDTH-1:0]               dmem_y_rdata,
+    input   type_scr1_mem_resp_e                        dmem_y_resp,
+`endif  // SCR1_RVY_EXT
 
 `ifdef SCR1_DBGC_EN
     // DBGC interface
@@ -85,6 +101,9 @@ module scr1_pipe_top (
     output  logic                                       exu_busy,
     output  logic                                       lsu_busy,
     output  logic                                       ialu_busy,
+`ifdef SCR1_RVY_EXT
+    output  logic                                       lsu_y_busy,
+`endif  // SCR1_RVY_EXT
 
     // Fuse
     input   logic [`SCR1_XLEN-1:0]                      fuse_mhartid
@@ -367,6 +386,19 @@ scr1_pipe_exu i_pipe_exu (
     .dmem2exu_req_ack       (dmem_req_ack         ),
     .dmem2exu_rdata         (dmem_rdata           ),
     .dmem2exu_resp          (dmem_resp            ),
+
+`ifdef SCR1_RVY_EXT
+    .exu2dmem_y_req           (dmem_y_req             ),
+    .exu2dmem_y_cmd           (dmem_y_cmd             ),
+    .exu2dmem_y_width         (dmem_y_width           ),
+    .exu2dmem_y_addr          (dmem_y_addr            ),
+    .exu2dmem_y_wdata         (dmem_y_wdata           ),
+    .dmem2exu_y_req_ack       (dmem_y_req_ack         ),
+    .dmem2exu_y_rdata         (dmem_y_rdata           ),
+    .dmem2exu_y_resp          (dmem_y_resp            ),
+`endif  // SCR1_RVY_EXT
+
+
 `ifdef SCR1_DBGC_EN
     .exu_no_commit          (exu_no_commit        ),
     .exu_irq_dsbl           (exu_irq_dsbl         ),
@@ -404,6 +436,9 @@ scr1_pipe_exu i_pipe_exu (
     .new_pc_req             (new_pc_req           ),
     .new_pc                 (new_pc               ),
 
+`ifdef SCR1_RVY_EXT
+    .lsu_y_busy             (lsu_y_busy           ),
+`endif  // SCR1_RVY_EXT
     .exu_busy               (exu_busy             ),
     .lsu_busy               (lsu_busy             ),
     .ialu_busy              (ialu_busy            )

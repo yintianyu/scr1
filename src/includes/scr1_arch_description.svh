@@ -73,6 +73,8 @@ parameter bit [`SCR1_DMEM_AWIDTH-1:0]   SCR1_TIMER_ADDR_PATTERN     = 'h00490000
 parameter bit [`SCR1_XLEN-1:0]                              SCR1_ARCH_RST_VECTOR                = `SCR1_XLEN'h200;
 parameter bit [`SCR1_XLEN-1:SCR1_CSR_MTVEC_BASE_ZERO_BITS]  SCR1_ARCH_CSR_MTVEC_BASE_RST_VAL    = SCR1_CSR_MTVEC_BASE_VAL_BITS'(`SCR1_XLEN'h1C0 >> SCR1_CSR_MTVEC_BASE_ZERO_BITS);
 
+// LSU Highspeed parameters:
+
 `else // SCR1_ARCH_CUSTOM
 
 //------------------------------------------------
