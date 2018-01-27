@@ -331,8 +331,10 @@ always_comb begin
                     SCR1_OPCODE_OP_DLA          : begin
                         idu2exu_use_rs1         = 1'b1;
                         idu2exu_use_rs2         = 1'b1;
+                        idu2exu_use_rd          = 1'b1;
                         idu2exu_use_imm         = 1'b1;
                         idu2exu_cmd.imm         = {{25{instr[31]}}, instr[30:25]};
+                        idu2exu_cmd.rd_wb_sel   = SCR1_RD_WB_DLA;
                         case (funct3)
                             3'b000  : idu2exu_cmd.dla_cmd = SCR1_DLA_CMD_NONE;
                             3'b001  : idu2exu_cmd.dla_cmd = SCR1_DLA_CMD_CMAC;

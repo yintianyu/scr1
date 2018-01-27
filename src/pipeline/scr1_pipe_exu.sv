@@ -817,6 +817,7 @@ always_comb begin
         SCR1_RD_WB_INC_PC   : exu2mprf_rd_data = inc_pc;
         SCR1_RD_WB_LSU      : exu2mprf_rd_data = lsu_l_data;
         SCR1_RD_WB_CSR      : exu2mprf_rd_data = csr2exu_r_data;
+        SCR1_RD_WB_DLA      : exu2mprf_rd_data = dla_res;
         default             : exu2mprf_rd_data = ialu_res;      // IALU by default
     endcase
 end

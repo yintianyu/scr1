@@ -127,13 +127,13 @@ function automatic logic [`YTYDLA_LSU_WIDTH-1:0] mem_read_y (
     );
 
     mem_read_y  = 'x;
-    $display("In mem_read_y:\n");
-    $display("adr = 0x%x\n", adr);
+//  $display("In mem_read_y:\n");
+//  $display("adr = 0x%x\n", adr);
     
 
     for (int i = 0; i < bytes_num; ++i) begin
         mem_read_y[(i*8)+:8] = memory[adr + i];
-        $display("memory[0x%x] = 0x%x\n",adr + i, memory[adr + i]);
+//      $display("memory[0x%x] = 0x%x\n",adr + i, memory[adr + i]);
     end
 endfunction : mem_read_y
 `endif // SCR1_RVY_EXT

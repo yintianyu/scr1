@@ -189,12 +189,13 @@ typedef enum logic [SCR1_DLA_CMD_WIDTH_E-1:0] {
 //-------------------------------------------------------------------------------
 // MPRF rd writeback source
 //-------------------------------------------------------------------------------
-localparam SCR1_RD_WB_ALL_NUM_E = 7;
+localparam SCR1_RD_WB_ALL_NUM_E = 8;
 localparam SCR1_RD_WB_WIDTH_E   = $clog2(SCR1_RD_WB_ALL_NUM_E);
 typedef enum logic [SCR1_RD_WB_WIDTH_E-1:0] {
     SCR1_RD_WB_NONE = '0,
     SCR1_RD_WB_IALU,            // IALU main result
     SCR1_RD_WB_SUM2,            // IALU SUM2 result (AUIPC)
+    SCR1_RD_WB_DLA,
     SCR1_RD_WB_IMM,             // LUI
     SCR1_RD_WB_INC_PC,          // JAL(R)
     SCR1_RD_WB_LSU,             // Load from DMEM
