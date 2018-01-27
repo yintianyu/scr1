@@ -444,7 +444,8 @@ ytydla i_dla(
     .res_vld            (dla_rdy),
     .exu2dla_wdata      (lsu_y_l_data),
     .exu2dla_wreq       (exu2dla_wreq),
-    .exu2dla_waddr      (exu_queue.rd_wb_y_addr)
+    .exu2dla_waddr      (exu_queue.rd_wb_y_addr),
+    .exu2dla_wsize      (exu_queue.lsu_y_cmd)
     );
 `endif  // SCR1_RVY_EXT
 

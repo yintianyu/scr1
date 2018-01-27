@@ -108,14 +108,8 @@ always_comb begin
     l_misalign = 1'b0;
     s_misalign = 1'b0;
     if (exu2lsu_req) begin
-        case (exu2lsu_cmd)
-            SCR1_LSU_CMD_LH,
-            SCR1_LSU_CMD_LHU,
-            SCR1_LSU_CMD_LW     : l_misalign = |exu2lsu_addr[1:0];
-            SCR1_LSU_CMD_SH,
-            SCR1_LSU_CMD_SW     : s_misalign = |exu2lsu_addr[1:0];
-            default : begin end
-        endcase // exu2lsu_cmd
+        l_misalign = |exu2lsu_addr[1:0];
+        s_misalign = |exu2lsu_addr[1:0];
     end
 end
 
@@ -173,13 +167,25 @@ assign lsu2dmem_wdata   = exu2lsu_s_data;
 
 always_comb begin
     case (exu2lsu_cmd)
-        SCR1_LSU_Y_CMD_FIVE_WORDS: begin
+        SCR1_LSU_Y_CMD_ONE_WORD: begin
             lsu2dmem_cmd    = SCR1_MEM_CMD_RD;
-            lsu2dmem_width  = SCR1_MEM_Y_WIDTH_FIVE_WORD;
+            lsu2dmem_width  = SCR1_MEM_Y_WIDTH_ONE_WORD;
+        end
+        SCR1_LSU_Y_CMD_TWO_WORDS: begin
+            lsu2dmem_cmd    = SCR1_MEM_CMD_RD;
+            lsu2dmem_width  = SCR1_MEM_Y_WIDTH_TWO_WORD;
         end
         SCR1_LSU_Y_CMD_THREE_WORDS: begin
             lsu2dmem_cmd    = SCR1_MEM_CMD_RD;
             lsu2dmem_width  = SCR1_MEM_Y_WIDTH_THREE_WORD;
+        end
+        SCR1_LSU_Y_CMD_FOUR_WORDS: begin
+            lsu2dmem_cmd    = SCR1_MEM_CMD_RD;
+            lsu2dmem_width  = SCR1_MEM_Y_WIDTH_FOUR_WORD;
+        end
+        SCR1_LSU_Y_CMD_FIVE_WORDS: begin
+            lsu2dmem_cmd    = SCR1_MEM_CMD_RD;
+            lsu2dmem_width  = SCR1_MEM_Y_WIDTH_FIVE_WORD;
         end
         default             : begin
             lsu2dmem_cmd    = SCR1_MEM_CMD_RD;

@@ -30,10 +30,13 @@ typedef enum logic[1:0] {
 // Highspeed memory data width enum
 //-------------------------------------------------------------------------------
 `ifdef SCR1_RVY_EXT
-typedef enum logic[1:0] {
-    SCR1_MEM_Y_WIDTH_FIVE_WORD     = 2'b00,
-    SCR1_MEM_Y_WIDTH_THREE_WORD    = 2'b01,
-    SCR1_MEM_Y_WIDTH_ERROR    = 'x
+typedef enum logic[2:0] {
+    SCR1_MEM_Y_WIDTH_ONE_WORD      = 3'b001,
+    SCR1_MEM_Y_WIDTH_TWO_WORD      = 3'b010,
+    SCR1_MEM_Y_WIDTH_THREE_WORD    = 3'b011,
+    SCR1_MEM_Y_WIDTH_FOUR_WORD     = 3'b100,
+    SCR1_MEM_Y_WIDTH_FIVE_WORD     = 3'b101,
+    SCR1_MEM_Y_WIDTH_ERROR         = 'x
 } type_scr1_mem_y_width_e;
 `endif  // SCR1_RVY_EXT
 

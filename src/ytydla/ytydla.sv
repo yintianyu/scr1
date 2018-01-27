@@ -13,9 +13,10 @@ module ytydla(
 
     input   [`YTYDLA_LSU_WIDTH-1:0]     exu2dla_wdata,
     input                               exu2dla_wreq,
-    input   [8:0]                       exu2dla_waddr
+    input   [8:0]                       exu2dla_waddr,
+    input   [2:0]                       exu2dla_wsize
     );
-logic   [7:0]               reg_file[0:1023];
+logic   [7:0]               reg_file[0:511];
 
 //-------------------------------------------------------------------------------
 // Write Register File
@@ -26,26 +27,79 @@ always_ff @(posedge clk or negedge rst_n) begin
     end
     else begin
         if (exu2dla_wreq) begin
-            reg_file[exu2dla_waddr + 0] <= exu2dla_wdata[7:0];
-            reg_file[exu2dla_waddr + 1] <= exu2dla_wdata[15:8];
-            reg_file[exu2dla_waddr + 2] <= exu2dla_wdata[23:16];
-            reg_file[exu2dla_waddr + 3] <= exu2dla_wdata[31:24];
-            reg_file[exu2dla_waddr + 4] <= exu2dla_wdata[39:32];
-            reg_file[exu2dla_waddr + 5] <= exu2dla_wdata[47:40];
-            reg_file[exu2dla_waddr + 6] <= exu2dla_wdata[55:48];
-            reg_file[exu2dla_waddr + 7] <= exu2dla_wdata[63:56];
-            reg_file[exu2dla_waddr + 8] <= exu2dla_wdata[71:64];
-            reg_file[exu2dla_waddr + 9] <= exu2dla_wdata[79:72];
-            reg_file[exu2dla_waddr + 10] <= exu2dla_wdata[87:80];
-            reg_file[exu2dla_waddr + 11] <= exu2dla_wdata[95:88];
-            reg_file[exu2dla_waddr + 12] <= exu2dla_wdata[103:96];
-            reg_file[exu2dla_waddr + 13] <= exu2dla_wdata[111:104];
-            reg_file[exu2dla_waddr + 14] <= exu2dla_wdata[119:112];
-            reg_file[exu2dla_waddr + 15] <= exu2dla_wdata[127:120];
-            reg_file[exu2dla_waddr + 16] <= exu2dla_wdata[135:128];
-            reg_file[exu2dla_waddr + 17] <= exu2dla_wdata[143:136];
-            reg_file[exu2dla_waddr + 18] <= exu2dla_wdata[151:144];
-            reg_file[exu2dla_waddr + 19] <= exu2dla_wdata[159:152];
+            case (exu2dla_wsize)
+                3'b001:begin
+                    reg_file[exu2dla_waddr + 0] <= exu2dla_wdata[7:0];
+                    reg_file[exu2dla_waddr + 1] <= exu2dla_wdata[15:8];
+                    reg_file[exu2dla_waddr + 2] <= exu2dla_wdata[23:16];
+                    reg_file[exu2dla_waddr + 3] <= exu2dla_wdata[31:24];
+                end
+                3'b010:begin
+                    reg_file[exu2dla_waddr + 0] <= exu2dla_wdata[7:0];
+                    reg_file[exu2dla_waddr + 1] <= exu2dla_wdata[15:8];
+                    reg_file[exu2dla_waddr + 2] <= exu2dla_wdata[23:16];
+                    reg_file[exu2dla_waddr + 3] <= exu2dla_wdata[31:24];
+                    reg_file[exu2dla_waddr + 4] <= exu2dla_wdata[39:32];
+                    reg_file[exu2dla_waddr + 5] <= exu2dla_wdata[47:40];
+                    reg_file[exu2dla_waddr + 6] <= exu2dla_wdata[55:48];
+                    reg_file[exu2dla_waddr + 7] <= exu2dla_wdata[63:56];
+                end
+                3'b011:begin
+                    reg_file[exu2dla_waddr + 0] <= exu2dla_wdata[7:0];
+                    reg_file[exu2dla_waddr + 1] <= exu2dla_wdata[15:8];
+                    reg_file[exu2dla_waddr + 2] <= exu2dla_wdata[23:16];
+                    reg_file[exu2dla_waddr + 3] <= exu2dla_wdata[31:24];
+                    reg_file[exu2dla_waddr + 4] <= exu2dla_wdata[39:32];
+                    reg_file[exu2dla_waddr + 5] <= exu2dla_wdata[47:40];
+                    reg_file[exu2dla_waddr + 6] <= exu2dla_wdata[55:48];
+                    reg_file[exu2dla_waddr + 7] <= exu2dla_wdata[63:56];
+                    reg_file[exu2dla_waddr + 8] <= exu2dla_wdata[71:64];
+                    reg_file[exu2dla_waddr + 9] <= exu2dla_wdata[79:72];
+                    reg_file[exu2dla_waddr + 10] <= exu2dla_wdata[87:80];
+                    reg_file[exu2dla_waddr + 11] <= exu2dla_wdata[95:88];
+                end
+                3'b100:begin
+                    reg_file[exu2dla_waddr + 0] <= exu2dla_wdata[7:0];
+                    reg_file[exu2dla_waddr + 1] <= exu2dla_wdata[15:8];
+                    reg_file[exu2dla_waddr + 2] <= exu2dla_wdata[23:16];
+                    reg_file[exu2dla_waddr + 3] <= exu2dla_wdata[31:24];
+                    reg_file[exu2dla_waddr + 4] <= exu2dla_wdata[39:32];
+                    reg_file[exu2dla_waddr + 5] <= exu2dla_wdata[47:40];
+                    reg_file[exu2dla_waddr + 6] <= exu2dla_wdata[55:48];
+                    reg_file[exu2dla_waddr + 7] <= exu2dla_wdata[63:56];
+                    reg_file[exu2dla_waddr + 8] <= exu2dla_wdata[71:64];
+                    reg_file[exu2dla_waddr + 9] <= exu2dla_wdata[79:72];
+                    reg_file[exu2dla_waddr + 10] <= exu2dla_wdata[87:80];
+                    reg_file[exu2dla_waddr + 11] <= exu2dla_wdata[95:88];
+                    reg_file[exu2dla_waddr + 12] <= exu2dla_wdata[103:96];
+                    reg_file[exu2dla_waddr + 13] <= exu2dla_wdata[111:104];
+                    reg_file[exu2dla_waddr + 14] <= exu2dla_wdata[119:112];
+                    reg_file[exu2dla_waddr + 15] <= exu2dla_wdata[127:120];
+                end
+                3'b101:begin
+                    reg_file[exu2dla_waddr + 0] <= exu2dla_wdata[7:0];
+                    reg_file[exu2dla_waddr + 1] <= exu2dla_wdata[15:8];
+                    reg_file[exu2dla_waddr + 2] <= exu2dla_wdata[23:16];
+                    reg_file[exu2dla_waddr + 3] <= exu2dla_wdata[31:24];
+                    reg_file[exu2dla_waddr + 4] <= exu2dla_wdata[39:32];
+                    reg_file[exu2dla_waddr + 5] <= exu2dla_wdata[47:40];
+                    reg_file[exu2dla_waddr + 6] <= exu2dla_wdata[55:48];
+                    reg_file[exu2dla_waddr + 7] <= exu2dla_wdata[63:56];
+                    reg_file[exu2dla_waddr + 8] <= exu2dla_wdata[71:64];
+                    reg_file[exu2dla_waddr + 9] <= exu2dla_wdata[79:72];
+                    reg_file[exu2dla_waddr + 10] <= exu2dla_wdata[87:80];
+                    reg_file[exu2dla_waddr + 11] <= exu2dla_wdata[95:88];
+                    reg_file[exu2dla_waddr + 12] <= exu2dla_wdata[103:96];
+                    reg_file[exu2dla_waddr + 13] <= exu2dla_wdata[111:104];
+                    reg_file[exu2dla_waddr + 14] <= exu2dla_wdata[119:112];
+                    reg_file[exu2dla_waddr + 15] <= exu2dla_wdata[127:120];
+                    reg_file[exu2dla_waddr + 16] <= exu2dla_wdata[135:128];
+                    reg_file[exu2dla_waddr + 17] <= exu2dla_wdata[143:136];
+                    reg_file[exu2dla_waddr + 18] <= exu2dla_wdata[151:144];
+                    reg_file[exu2dla_waddr + 19] <= exu2dla_wdata[159:152];
+                end
+                default:begin end
+            endcase
         end
     end
 end

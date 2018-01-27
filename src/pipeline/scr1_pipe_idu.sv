@@ -214,10 +214,13 @@ always_comb begin
                         idu2exu_use_rs1         = 1'b1;
                         idu2exu_cmd.rd_wb_y_sel  = SCR1_RD_WB_LSU;
                         idu2exu_cmd.rd_wb_y_addr = {instr[20], funct3, instr[11:7]};
-                        case (instr[22:21])
-                            2'b00   :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_NONE;
-                            2'b01   :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_FIVE_WORDS;
-                            2'b10   :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_THREE_WORDS;
+                        case (instr[23:21])
+                            3'b000  :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_NONE;
+                            3'b001  :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_ONE_WORD;
+                            3'b010  :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_TWO_WORDS;
+                            3'b011  :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_THREE_WORDS;
+                            3'b100  :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_FOUR_WORDS;
+                            3'b101  :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_FIVE_WORDS;
                             default :   idu2exu_cmd.lsu_y_cmd = SCR1_LSU_Y_CMD_NONE;
                         endcase
 

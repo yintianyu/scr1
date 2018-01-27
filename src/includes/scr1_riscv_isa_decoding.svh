@@ -142,12 +142,15 @@ typedef enum logic [SCR1_LSU_CMD_WIDTH_E-1:0] {
 // LSU Highspeed commands
 //-------------------------------------------------------------------------------
 `ifdef SCR1_RVY_EXT
-localparam SCR1_LSU_Y_CMD_ALL_NUM_E   = 3;
+localparam SCR1_LSU_Y_CMD_ALL_NUM_E   = 6;
 localparam SCR1_LSU_Y_CMD_WIDTH_E     = $clog2(SCR1_LSU_Y_CMD_ALL_NUM_E);
 typedef enum logic [SCR1_LSU_CMD_WIDTH_E-1:0] {
     SCR1_LSU_Y_CMD_NONE = '0,
-    SCR1_LSU_Y_CMD_FIVE_WORDS,
-    SCR1_LSU_Y_CMD_THREE_WORDS
+    SCR1_LSU_Y_CMD_ONE_WORD,
+    SCR1_LSU_Y_CMD_TWO_WORDS,
+    SCR1_LSU_Y_CMD_THREE_WORDS,
+    SCR1_LSU_Y_CMD_FOUR_WORDS,
+    SCR1_LSU_Y_CMD_FIVE_WORDS
 } type_scr1_lsu_y_cmd_sel_e;
 `endif  // SCR1_RVY_EXT
 
