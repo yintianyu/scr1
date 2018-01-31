@@ -448,6 +448,10 @@ int                                 rvc_ctrl_count;
 int                                 rvc_ls_count;
 int                                 rvc_other_count;
 `endif //SCR1_RVC_EXT
+`ifdef SCR1_RVY_EXT
+int                                 rvy_cal_count;
+int                                 rvy_ls_count;
+`endif // SCR1_RVY_EXT
 int                                 other_count;
 always_ff @(negedge rst_n, posedge clk) begin
     if (~rst_n) begin
@@ -466,6 +470,10 @@ always_ff @(negedge rst_n, posedge clk) begin
             rvc_ls_count                <= 0;
             rvc_other_count             <= 0;
 `endif //SCR1_RVC_EXT
+`ifdef SCR1_RVY_EXT
+            rvy_cal_count               <= 0;
+            rvy_ls_count                <= 0;
+`endif // SCR1_RVY_EXT
             other_count                 <= 0;
     end
     else begin
@@ -481,6 +489,10 @@ always_ff @(negedge rst_n, posedge clk) begin
             $fwrite(trace_fhandler_instr_sort, "rvc_ls_count   ");
             $fwrite(trace_fhandler_instr_sort, "rvc_other_count   ");
 `endif //SCR1_RVC_EXT
+`ifdef SCR1_RVY_EXT
+            $fwrite(trace_fhandler_instr_sort, "rvy_cal_count   ");
+            $fwrite(trace_fhandler_instr_sort, "rvy_ls_count   ");
+`endif
             $fwrite(trace_fhandler_instr_sort, "other_count\n");
         end
         else begin
@@ -510,12 +522,18 @@ always_ff @(negedge rst_n, posedge clk) begin
                 SCR1_INSTR_SORT_RVC_OTHER: begin
                     rvc_other_count         <= rvc_other_count + 1;
                 end
+                SCR1_INSTR_SORT_RVY_CAL: begin
+                    rvy_cal_count           <= rvy_cal_count + 1;
+                end
+                SCR1_INSTR_SORT_RVY_LS: begin
+                    rvy_ls_count            <= rvy_ls_count + 1;
+                end
                 default: begin
                     other_count             <= other_count + 1;
                 end
                 endcase
             end
-            $fwrite(trace_fhandler_instr_sort, "%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\n",
+            $fwrite(trace_fhandler_instr_sort, "%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\n",
                     rvi_cal_count,
                     rvi_ctrl_count,
                     rvi_ls_count,
@@ -524,6 +542,8 @@ always_ff @(negedge rst_n, posedge clk) begin
                     rvc_ctrl_count,
                     rvc_ls_count,
                     rvc_other_count,
+                    rvy_cal_count,
+                    rvy_ls_count,
                     other_count);
         end
     end

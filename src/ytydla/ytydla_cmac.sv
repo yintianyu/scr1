@@ -472,7 +472,10 @@ module ytydla_cmac(ytydla_core_clk,
     logic                                      cmac2accu_valid;
     logic                                      accu2cmac_valid;
 
+    logic   signed      [63:0]                 bitmap;
+
     assign cmac2mem_valid = accu2cmac_valid;
+    assign bitmap = (mem2cmac_dat_size == 64) ? 64'hffffffffffffffff : (64'h7fffffffffffffff >> (63 - mem2cmac_dat_size));
 
     always_ff @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
         if (~ytydla_core_rst_n) begin
@@ -498,7 +501,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_0 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 0) begin
+            if(bitmap[0]) begin
                 cmac_dat_0 <= mem2cmac_dat_0;
             end
             else begin
@@ -512,7 +515,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_1 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 1) begin
+            if(bitmap[1]) begin
                 cmac_dat_1 <= mem2cmac_dat_1;
             end
             else begin
@@ -526,7 +529,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_2 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 2) begin
+            if(bitmap[2]) begin
                 cmac_dat_2 <= mem2cmac_dat_2;
             end
             else begin
@@ -540,7 +543,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_3 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 3) begin
+            if(bitmap[3]) begin
                 cmac_dat_3 <= mem2cmac_dat_3;
             end
             else begin
@@ -554,7 +557,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_4 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 4) begin
+            if(bitmap[4]) begin
                 cmac_dat_4 <= mem2cmac_dat_4;
             end
             else begin
@@ -568,7 +571,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_5 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 5) begin
+            if(bitmap[5]) begin
                 cmac_dat_5 <= mem2cmac_dat_5;
             end
             else begin
@@ -582,7 +585,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_6 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 6) begin
+            if(bitmap[6]) begin
                 cmac_dat_6 <= mem2cmac_dat_6;
             end
             else begin
@@ -596,7 +599,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_7 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 7) begin
+            if(bitmap[7]) begin
                 cmac_dat_7 <= mem2cmac_dat_7;
             end
             else begin
@@ -610,7 +613,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_8 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 8) begin
+            if(bitmap[8]) begin
                 cmac_dat_8 <= mem2cmac_dat_8;
             end
             else begin
@@ -624,7 +627,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_9 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 9) begin
+            if(bitmap[9]) begin
                 cmac_dat_9 <= mem2cmac_dat_9;
             end
             else begin
@@ -638,7 +641,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_10 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 10) begin
+            if(bitmap[10]) begin
                 cmac_dat_10 <= mem2cmac_dat_10;
             end
             else begin
@@ -652,7 +655,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_11 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 11) begin
+            if(bitmap[11]) begin
                 cmac_dat_11 <= mem2cmac_dat_11;
             end
             else begin
@@ -666,7 +669,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_12 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 12) begin
+            if(bitmap[12]) begin
                 cmac_dat_12 <= mem2cmac_dat_12;
             end
             else begin
@@ -680,7 +683,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_13 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 13) begin
+            if(bitmap[13]) begin
                 cmac_dat_13 <= mem2cmac_dat_13;
             end
             else begin
@@ -694,7 +697,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_14 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 14) begin
+            if(bitmap[14]) begin
                 cmac_dat_14 <= mem2cmac_dat_14;
             end
             else begin
@@ -708,7 +711,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_15 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 15) begin
+            if(bitmap[15]) begin
                 cmac_dat_15 <= mem2cmac_dat_15;
             end
             else begin
@@ -722,7 +725,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_16 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 16) begin
+            if(bitmap[16]) begin
                 cmac_dat_16 <= mem2cmac_dat_16;
             end
             else begin
@@ -736,7 +739,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_17 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 17) begin
+            if(bitmap[17]) begin
                 cmac_dat_17 <= mem2cmac_dat_17;
             end
             else begin
@@ -750,7 +753,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_18 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 18) begin
+            if(bitmap[18]) begin
                 cmac_dat_18 <= mem2cmac_dat_18;
             end
             else begin
@@ -764,7 +767,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_19 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 19) begin
+            if(bitmap[19]) begin
                 cmac_dat_19 <= mem2cmac_dat_19;
             end
             else begin
@@ -778,7 +781,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_20 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 20) begin
+            if(bitmap[20]) begin
                 cmac_dat_20 <= mem2cmac_dat_20;
             end
             else begin
@@ -792,7 +795,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_21 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 21) begin
+            if(bitmap[21]) begin
                 cmac_dat_21 <= mem2cmac_dat_21;
             end
             else begin
@@ -806,7 +809,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_22 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 22) begin
+            if(bitmap[22]) begin
                 cmac_dat_22 <= mem2cmac_dat_22;
             end
             else begin
@@ -820,7 +823,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_23 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 23) begin
+            if(bitmap[23]) begin
                 cmac_dat_23 <= mem2cmac_dat_23;
             end
             else begin
@@ -834,7 +837,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_24 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 24) begin
+            if(bitmap[24]) begin
                 cmac_dat_24 <= mem2cmac_dat_24;
             end
             else begin
@@ -848,7 +851,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_25 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 25) begin
+            if(bitmap[25]) begin
                 cmac_dat_25 <= mem2cmac_dat_25;
             end
             else begin
@@ -862,7 +865,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_26 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 26) begin
+            if(bitmap[26]) begin
                 cmac_dat_26 <= mem2cmac_dat_26;
             end
             else begin
@@ -876,7 +879,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_27 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 27) begin
+            if(bitmap[27]) begin
                 cmac_dat_27 <= mem2cmac_dat_27;
             end
             else begin
@@ -890,7 +893,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_28 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 28) begin
+            if(bitmap[28]) begin
                 cmac_dat_28 <= mem2cmac_dat_28;
             end
             else begin
@@ -904,7 +907,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_29 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 29) begin
+            if(bitmap[29]) begin
                 cmac_dat_29 <= mem2cmac_dat_29;
             end
             else begin
@@ -918,7 +921,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_30 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 30) begin
+            if(bitmap[30]) begin
                 cmac_dat_30 <= mem2cmac_dat_30;
             end
             else begin
@@ -932,7 +935,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_31 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 31) begin
+            if(bitmap[31]) begin
                 cmac_dat_31 <= mem2cmac_dat_31;
             end
             else begin
@@ -946,7 +949,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_32 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 32) begin
+            if(bitmap[32]) begin
                 cmac_dat_32 <= mem2cmac_dat_32;
             end
             else begin
@@ -960,7 +963,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_33 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 33) begin
+            if(bitmap[33]) begin
                 cmac_dat_33 <= mem2cmac_dat_33;
             end
             else begin
@@ -974,7 +977,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_34 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 34) begin
+            if(bitmap[34]) begin
                 cmac_dat_34 <= mem2cmac_dat_34;
             end
             else begin
@@ -988,7 +991,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_35 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 35) begin
+            if(bitmap[35]) begin
                 cmac_dat_35 <= mem2cmac_dat_35;
             end
             else begin
@@ -1002,7 +1005,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_36 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 36) begin
+            if(bitmap[36]) begin
                 cmac_dat_36 <= mem2cmac_dat_36;
             end
             else begin
@@ -1016,7 +1019,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_37 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 37) begin
+            if(bitmap[37]) begin
                 cmac_dat_37 <= mem2cmac_dat_37;
             end
             else begin
@@ -1030,7 +1033,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_38 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 38) begin
+            if(bitmap[38]) begin
                 cmac_dat_38 <= mem2cmac_dat_38;
             end
             else begin
@@ -1044,7 +1047,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_39 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 39) begin
+            if(bitmap[39]) begin
                 cmac_dat_39 <= mem2cmac_dat_39;
             end
             else begin
@@ -1058,7 +1061,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_40 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 40) begin
+            if(bitmap[40]) begin
                 cmac_dat_40 <= mem2cmac_dat_40;
             end
             else begin
@@ -1072,7 +1075,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_41 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 41) begin
+            if(bitmap[41]) begin
                 cmac_dat_41 <= mem2cmac_dat_41;
             end
             else begin
@@ -1086,7 +1089,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_42 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 42) begin
+            if(bitmap[42]) begin
                 cmac_dat_42 <= mem2cmac_dat_42;
             end
             else begin
@@ -1100,7 +1103,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_43 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 43) begin
+            if(bitmap[43]) begin
                 cmac_dat_43 <= mem2cmac_dat_43;
             end
             else begin
@@ -1114,7 +1117,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_44 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 44) begin
+            if(bitmap[44]) begin
                 cmac_dat_44 <= mem2cmac_dat_44;
             end
             else begin
@@ -1128,7 +1131,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_45 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 45) begin
+            if(bitmap[45]) begin
                 cmac_dat_45 <= mem2cmac_dat_45;
             end
             else begin
@@ -1142,7 +1145,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_46 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 46) begin
+            if(bitmap[46]) begin
                 cmac_dat_46 <= mem2cmac_dat_46;
             end
             else begin
@@ -1156,7 +1159,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_47 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 47) begin
+            if(bitmap[47]) begin
                 cmac_dat_47 <= mem2cmac_dat_47;
             end
             else begin
@@ -1170,7 +1173,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_48 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 48) begin
+            if(bitmap[48]) begin
                 cmac_dat_48 <= mem2cmac_dat_48;
             end
             else begin
@@ -1184,7 +1187,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_49 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 49) begin
+            if(bitmap[49]) begin
                 cmac_dat_49 <= mem2cmac_dat_49;
             end
             else begin
@@ -1198,7 +1201,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_50 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 50) begin
+            if(bitmap[50]) begin
                 cmac_dat_50 <= mem2cmac_dat_50;
             end
             else begin
@@ -1212,7 +1215,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_51 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 51) begin
+            if(bitmap[51]) begin
                 cmac_dat_51 <= mem2cmac_dat_51;
             end
             else begin
@@ -1226,7 +1229,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_52 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 52) begin
+            if(bitmap[52]) begin
                 cmac_dat_52 <= mem2cmac_dat_52;
             end
             else begin
@@ -1240,7 +1243,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_53 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 53) begin
+            if(bitmap[53]) begin
                 cmac_dat_53 <= mem2cmac_dat_53;
             end
             else begin
@@ -1254,7 +1257,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_54 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 54) begin
+            if(bitmap[54]) begin
                 cmac_dat_54 <= mem2cmac_dat_54;
             end
             else begin
@@ -1268,7 +1271,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_55 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 55) begin
+            if(bitmap[55]) begin
                 cmac_dat_55 <= mem2cmac_dat_55;
             end
             else begin
@@ -1282,7 +1285,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_56 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 56) begin
+            if(bitmap[56]) begin
                 cmac_dat_56 <= mem2cmac_dat_56;
             end
             else begin
@@ -1296,7 +1299,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_57 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 57) begin
+            if(bitmap[57]) begin
                 cmac_dat_57 <= mem2cmac_dat_57;
             end
             else begin
@@ -1310,7 +1313,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_58 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 58) begin
+            if(bitmap[58]) begin
                 cmac_dat_58 <= mem2cmac_dat_58;
             end
             else begin
@@ -1324,7 +1327,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_59 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 59) begin
+            if(bitmap[59]) begin
                 cmac_dat_59 <= mem2cmac_dat_59;
             end
             else begin
@@ -1338,7 +1341,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_60 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 60) begin
+            if(bitmap[60]) begin
                 cmac_dat_60 <= mem2cmac_dat_60;
             end
             else begin
@@ -1352,7 +1355,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_61 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 61) begin
+            if(bitmap[61]) begin
                 cmac_dat_61 <= mem2cmac_dat_61;
             end
             else begin
@@ -1366,7 +1369,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_62 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 62) begin
+            if(bitmap[62]) begin
                 cmac_dat_62 <= mem2cmac_dat_62;
             end
             else begin
@@ -1380,7 +1383,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_dat_63 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 63) begin
+            if(bitmap[63]) begin
                 cmac_dat_63 <= mem2cmac_dat_63;
             end
             else begin
@@ -1397,7 +1400,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_0 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 0) begin
+            if(bitmap[0]) begin
                 cmac_wt_0 <= mem2cmac_wt_0;
             end
             else begin
@@ -1411,7 +1414,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_1 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 1) begin
+            if(bitmap[1]) begin
                 cmac_wt_1 <= mem2cmac_wt_1;
             end
             else begin
@@ -1425,7 +1428,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_2 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 2) begin
+            if(bitmap[2]) begin
                 cmac_wt_2 <= mem2cmac_wt_2;
             end
             else begin
@@ -1439,7 +1442,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_3 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 3) begin
+            if(bitmap[3]) begin
                 cmac_wt_3 <= mem2cmac_wt_3;
             end
             else begin
@@ -1453,7 +1456,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_4 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 4) begin
+            if(bitmap[4]) begin
                 cmac_wt_4 <= mem2cmac_wt_4;
             end
             else begin
@@ -1467,7 +1470,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_5 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 5) begin
+            if(bitmap[5]) begin
                 cmac_wt_5 <= mem2cmac_wt_5;
             end
             else begin
@@ -1481,7 +1484,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_6 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 6) begin
+            if(bitmap[6]) begin
                 cmac_wt_6 <= mem2cmac_wt_6;
             end
             else begin
@@ -1495,7 +1498,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_7 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 7) begin
+            if(bitmap[7]) begin
                 cmac_wt_7 <= mem2cmac_wt_7;
             end
             else begin
@@ -1509,7 +1512,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_8 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 8) begin
+            if(bitmap[8]) begin
                 cmac_wt_8 <= mem2cmac_wt_8;
             end
             else begin
@@ -1523,7 +1526,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_9 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 9) begin
+            if(bitmap[9]) begin
                 cmac_wt_9 <= mem2cmac_wt_9;
             end
             else begin
@@ -1537,7 +1540,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_10 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 10) begin
+            if(bitmap[10]) begin
                 cmac_wt_10 <= mem2cmac_wt_10;
             end
             else begin
@@ -1551,7 +1554,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_11 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 11) begin
+            if(bitmap[11]) begin
                 cmac_wt_11 <= mem2cmac_wt_11;
             end
             else begin
@@ -1565,7 +1568,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_12 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 12) begin
+            if(bitmap[12]) begin
                 cmac_wt_12 <= mem2cmac_wt_12;
             end
             else begin
@@ -1579,7 +1582,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_13 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 13) begin
+            if(bitmap[13]) begin
                 cmac_wt_13 <= mem2cmac_wt_13;
             end
             else begin
@@ -1593,7 +1596,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_14 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 14) begin
+            if(bitmap[14]) begin
                 cmac_wt_14 <= mem2cmac_wt_14;
             end
             else begin
@@ -1607,7 +1610,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_15 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 15) begin
+            if(bitmap[15]) begin
                 cmac_wt_15 <= mem2cmac_wt_15;
             end
             else begin
@@ -1621,7 +1624,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_16 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 16) begin
+            if(bitmap[16]) begin
                 cmac_wt_16 <= mem2cmac_wt_16;
             end
             else begin
@@ -1635,7 +1638,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_17 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 17) begin
+            if(bitmap[17]) begin
                 cmac_wt_17 <= mem2cmac_wt_17;
             end
             else begin
@@ -1649,7 +1652,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_18 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 18) begin
+            if(bitmap[18]) begin
                 cmac_wt_18 <= mem2cmac_wt_18;
             end
             else begin
@@ -1663,7 +1666,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_19 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 19) begin
+            if(bitmap[19]) begin
                 cmac_wt_19 <= mem2cmac_wt_19;
             end
             else begin
@@ -1677,7 +1680,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_20 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 20) begin
+            if(bitmap[20]) begin
                 cmac_wt_20 <= mem2cmac_wt_20;
             end
             else begin
@@ -1691,7 +1694,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_21 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 21) begin
+            if(bitmap[21]) begin
                 cmac_wt_21 <= mem2cmac_wt_21;
             end
             else begin
@@ -1705,7 +1708,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_22 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 22) begin
+            if(bitmap[22]) begin
                 cmac_wt_22 <= mem2cmac_wt_22;
             end
             else begin
@@ -1719,7 +1722,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_23 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 23) begin
+            if(bitmap[23]) begin
                 cmac_wt_23 <= mem2cmac_wt_23;
             end
             else begin
@@ -1733,7 +1736,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_24 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 24) begin
+            if(bitmap[24]) begin
                 cmac_wt_24 <= mem2cmac_wt_24;
             end
             else begin
@@ -1747,7 +1750,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_25 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 25) begin
+            if(bitmap[25]) begin
                 cmac_wt_25 <= mem2cmac_wt_25;
             end
             else begin
@@ -1761,7 +1764,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_26 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 26) begin
+            if(bitmap[26]) begin
                 cmac_wt_26 <= mem2cmac_wt_26;
             end
             else begin
@@ -1775,7 +1778,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_27 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 27) begin
+            if(bitmap[27]) begin
                 cmac_wt_27 <= mem2cmac_wt_27;
             end
             else begin
@@ -1789,7 +1792,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_28 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 28) begin
+            if(bitmap[28]) begin
                 cmac_wt_28 <= mem2cmac_wt_28;
             end
             else begin
@@ -1803,7 +1806,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_29 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 29) begin
+            if(bitmap[29]) begin
                 cmac_wt_29 <= mem2cmac_wt_29;
             end
             else begin
@@ -1817,7 +1820,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_30 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 30) begin
+            if(bitmap[30]) begin
                 cmac_wt_30 <= mem2cmac_wt_30;
             end
             else begin
@@ -1831,7 +1834,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_31 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 31) begin
+            if(bitmap[31]) begin
                 cmac_wt_31 <= mem2cmac_wt_31;
             end
             else begin
@@ -1845,7 +1848,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_32 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 32) begin
+            if(bitmap[32]) begin
                 cmac_wt_32 <= mem2cmac_wt_32;
             end
             else begin
@@ -1859,7 +1862,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_33 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 33) begin
+            if(bitmap[33]) begin
                 cmac_wt_33 <= mem2cmac_wt_33;
             end
             else begin
@@ -1873,7 +1876,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_34 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 34) begin
+            if(bitmap[34]) begin
                 cmac_wt_34 <= mem2cmac_wt_34;
             end
             else begin
@@ -1887,7 +1890,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_35 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 35) begin
+            if(bitmap[35]) begin
                 cmac_wt_35 <= mem2cmac_wt_35;
             end
             else begin
@@ -1901,7 +1904,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_36 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 36) begin
+            if(bitmap[36]) begin
                 cmac_wt_36 <= mem2cmac_wt_36;
             end
             else begin
@@ -1915,7 +1918,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_37 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 37) begin
+            if(bitmap[37]) begin
                 cmac_wt_37 <= mem2cmac_wt_37;
             end
             else begin
@@ -1929,7 +1932,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_38 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 38) begin
+            if(bitmap[38]) begin
                 cmac_wt_38 <= mem2cmac_wt_38;
             end
             else begin
@@ -1943,7 +1946,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_39 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 39) begin
+            if(bitmap[39]) begin
                 cmac_wt_39 <= mem2cmac_wt_39;
             end
             else begin
@@ -1957,7 +1960,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_40 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 40) begin
+            if(bitmap[40]) begin
                 cmac_wt_40 <= mem2cmac_wt_40;
             end
             else begin
@@ -1971,7 +1974,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_41 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 41) begin
+            if(bitmap[41]) begin
                 cmac_wt_41 <= mem2cmac_wt_41;
             end
             else begin
@@ -1985,7 +1988,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_42 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 42) begin
+            if(bitmap[42]) begin
                 cmac_wt_42 <= mem2cmac_wt_42;
             end
             else begin
@@ -1999,7 +2002,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_43 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 43) begin
+            if(bitmap[43]) begin
                 cmac_wt_43 <= mem2cmac_wt_43;
             end
             else begin
@@ -2013,7 +2016,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_44 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 44) begin
+            if(bitmap[44]) begin
                 cmac_wt_44 <= mem2cmac_wt_44;
             end
             else begin
@@ -2027,7 +2030,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_45 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 45) begin
+            if(bitmap[45]) begin
                 cmac_wt_45 <= mem2cmac_wt_45;
             end
             else begin
@@ -2041,7 +2044,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_46 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 46) begin
+            if(bitmap[46]) begin
                 cmac_wt_46 <= mem2cmac_wt_46;
             end
             else begin
@@ -2055,7 +2058,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_47 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 47) begin
+            if(bitmap[47]) begin
                 cmac_wt_47 <= mem2cmac_wt_47;
             end
             else begin
@@ -2069,7 +2072,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_48 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 48) begin
+            if(bitmap[48]) begin
                 cmac_wt_48 <= mem2cmac_wt_48;
             end
             else begin
@@ -2083,7 +2086,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_49 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 49) begin
+            if(bitmap[49]) begin
                 cmac_wt_49 <= mem2cmac_wt_49;
             end
             else begin
@@ -2097,7 +2100,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_50 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 50) begin
+            if(bitmap[50]) begin
                 cmac_wt_50 <= mem2cmac_wt_50;
             end
             else begin
@@ -2111,7 +2114,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_51 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 51) begin
+            if(bitmap[51]) begin
                 cmac_wt_51 <= mem2cmac_wt_51;
             end
             else begin
@@ -2125,7 +2128,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_52 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 52) begin
+            if(bitmap[52]) begin
                 cmac_wt_52 <= mem2cmac_wt_52;
             end
             else begin
@@ -2139,7 +2142,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_53 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 53) begin
+            if(bitmap[53]) begin
                 cmac_wt_53 <= mem2cmac_wt_53;
             end
             else begin
@@ -2153,7 +2156,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_54 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 54) begin
+            if(bitmap[54]) begin
                 cmac_wt_54 <= mem2cmac_wt_54;
             end
             else begin
@@ -2167,7 +2170,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_55 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 55) begin
+            if(bitmap[55]) begin
                 cmac_wt_55 <= mem2cmac_wt_55;
             end
             else begin
@@ -2181,7 +2184,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_56 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 56) begin
+            if(bitmap[56]) begin
                 cmac_wt_56 <= mem2cmac_wt_56;
             end
             else begin
@@ -2195,7 +2198,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_57 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 57) begin
+            if(bitmap[57]) begin
                 cmac_wt_57 <= mem2cmac_wt_57;
             end
             else begin
@@ -2209,7 +2212,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_58 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 58) begin
+            if(bitmap[58]) begin
                 cmac_wt_58 <= mem2cmac_wt_58;
             end
             else begin
@@ -2223,7 +2226,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_59 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 59) begin
+            if(bitmap[59]) begin
                 cmac_wt_59 <= mem2cmac_wt_59;
             end
             else begin
@@ -2237,7 +2240,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_60 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 60) begin
+            if(bitmap[60]) begin
                 cmac_wt_60 <= mem2cmac_wt_60;
             end
             else begin
@@ -2251,7 +2254,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_61 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 61) begin
+            if(bitmap[61]) begin
                 cmac_wt_61 <= mem2cmac_wt_61;
             end
             else begin
@@ -2265,7 +2268,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_62 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 62) begin
+            if(bitmap[62]) begin
                 cmac_wt_62 <= mem2cmac_wt_62;
             end
             else begin
@@ -2279,7 +2282,7 @@ module ytydla_cmac(ytydla_core_clk,
             cmac_wt_63 <= 0;
         end
         else begin
-            if(mem2cmac_dat_size > 63) begin
+            if(bitmap[63]) begin
                 cmac_wt_63 <= mem2cmac_wt_63;
             end
             else begin

@@ -182,6 +182,10 @@ logic [`SCR1_XLEN-1:0]          dla_op2;
 logic [`SCR1_XLEN-1:0]          dla_size;
 logic [`SCR1_XLEN-1:0]          dla_res;
 
+logic [11:0]                    shift_size; // Only 3 and 5 are supported
+logic                           shift_req;
+logic                           shift_type;
+
 // LSU at High Speed
 logic [`SCR1_XLEN-1:0]          lsu_y_addr;
 `endif  // SCR1_RVY_EXT
@@ -366,7 +370,7 @@ always_comb begin
 
 `ifdef SCR1_RVY_EXT
     // DLA
-    if (exu_queue.dla_cmd != SCR1_DLA_CMD_NONE) begin
+    if (exu_queue.dla_cmd == SCR1_DLA_CMD_CMAC) begin
         dla_op1  = mprf2exu_rs1_data;
         dla_op2  = mprf2exu_rs2_data;
         dla_size = exu_queue.imm;
@@ -375,6 +379,15 @@ always_comb begin
         dla_op1  = 'b0;
         dla_op2  = 'b0;
         dla_size = 'b0;
+    end
+    // Y.SHIFT
+    if (exu_queue.dla_cmd == SCR1_DLA_CMD_SHIFT_DAT || exu_queue.dla_cmd == SCR1_DLA_CMD_SHIFT_WT) begin
+        shift_size = exu_queue.imm[11:0];
+        shift_type = (exu_queue.dla_cmd == SCR1_DLA_CMD_SHIFT_DAT) ? 1'b0 : 1'b1;
+    end
+    else begin
+        shift_size = 'b0;
+        shift_type = 1'b0;
     end
     // LSU_Y
     if (exu_queue.lsu_y_cmd != SCR1_LSU_Y_CMD_NONE) begin
@@ -429,7 +442,8 @@ scr1_pipe_ialu i_ialu(
 // Yin Tianyu's Deep Learning Accelerator (YTYDLA)
 //-------------------------------------------------------------------------------
 `ifdef SCR1_RVY_EXT
-assign dla_req  = ((exu_queue.dla_cmd != SCR1_DLA_CMD_NONE) & exu_queue_vd);
+assign dla_req  = ((exu_queue.dla_cmd == SCR1_DLA_CMD_CMAC) & exu_queue_vd);
+assign shift_req = ((exu_queue.dla_cmd == SCR1_DLA_CMD_SHIFT_DAT || exu_queue.dla_cmd == SCR1_DLA_CMD_SHIFT_WT) & exu_queue_vd);
 assign exu2dla_wreq = (exu_queue.rd_wb_y_sel != SCR1_RD_WB_NONE) & exu_queue_vd & ~exc_req & exu_rdy;
 
 ytydla i_dla(
@@ -437,15 +451,16 @@ ytydla i_dla(
     .clk                (clk),
 
     .dla_req            (dla_req),
-    .dat_addr           (dla_op1),
-    .wt_addr            (dla_op2),
     .size               (dla_size),
     .result             (dla_res),
     .res_vld            (dla_rdy),
     .exu2dla_wdata      (lsu_y_l_data),
     .exu2dla_wreq       (exu2dla_wreq),
     .exu2dla_waddr      (exu_queue.rd_wb_y_addr),
-    .exu2dla_wsize      (exu_queue.lsu_y_cmd)
+    .exu2dla_wsize      (exu_queue.lsu_y_cmd),
+    .shift_size         (shift_size),
+    .shift_req          (shift_req),
+    .shift_type         (shift_type)
     );
 `endif  // SCR1_RVY_EXT
 

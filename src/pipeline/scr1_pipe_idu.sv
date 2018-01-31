@@ -228,10 +228,22 @@ always_comb begin
                         if (instr[11] | instr[19])  rve_illegal = 1'b1;
 `endif  // SCR1_RVE_EXT
 `ifdef SCR1_INSTR_SORT
-                        instr_sort              = SCR1_INSTR_SORT_RVI_LS;
+                        instr_sort              = SCR1_INSTR_SORT_RVY_LS;
 `endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_LOAD_Y
 
+                    SCR1_OPCODE_SHIFT             : begin
+                        idu2exu_use_imm         = 1'b1;
+                        idu2exu_cmd.imm         = instr[31:20];
+                        case (funct3)
+                            3'b001  :   idu2exu_cmd.dla_cmd = SCR1_DLA_CMD_SHIFT_DAT;
+                            3'b010  :   idu2exu_cmd.dla_cmd = SCR1_DLA_CMD_SHIFT_WT;
+                            default :   idu2exu_cmd.dla_cmd = SCR1_DLA_CMD_NONE;
+                        endcase
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVY_LS;
+`endif  // SCR1_INSTR_SORT
+                    end
 
 `endif  // SCR1_RVY_EXT
 
@@ -336,7 +348,7 @@ always_comb begin
                         idu2exu_use_rs2         = 1'b1;
                         idu2exu_use_rd          = 1'b1;
                         idu2exu_use_imm         = 1'b1;
-                        idu2exu_cmd.imm         = {{25{instr[31]}}, instr[30:25]};
+                        idu2exu_cmd.imm         = {{24{1'b0}}, instr[31:25]};
                         idu2exu_cmd.rd_wb_sel   = SCR1_RD_WB_DLA;
                         case (funct3)
                             3'b000  : idu2exu_cmd.dla_cmd = SCR1_DLA_CMD_NONE;
@@ -344,6 +356,9 @@ always_comb begin
                             3'b010  : idu2exu_cmd.dla_cmd = SCR1_DLA_CMD_VINP;
                             default : idu2exu_cmd.dla_cmd = SCR1_DLA_CMD_NONE;
                         endcase
+`ifdef SCR1_INSTR_SORT
+                        instr_sort              = SCR1_INSTR_SORT_RVY_CAL;
+`endif  // SCR1_INSTR_SORT
                     end // SCR1_OPCODE_OP_Y
 `endif  // SCR1_RVY_EXT
 

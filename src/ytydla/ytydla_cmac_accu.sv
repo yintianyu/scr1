@@ -206,71 +206,177 @@ module ytydla_cmac_accu(ytydla_core_clk,
     end
 
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_0 <= cmac2accu_adder_3 + cmac2accu_adder_2 + cmac2accu_adder_1 + cmac2accu_adder_0;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_0 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_0 <= cmac2accu_adder_3 + cmac2accu_adder_2 + cmac2accu_adder_1 + cmac2accu_adder_0;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_1 <= cmac2accu_adder_7 + cmac2accu_adder_6 + cmac2accu_adder_5 + cmac2accu_adder_4;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_1 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_1 <= cmac2accu_adder_7 + cmac2accu_adder_6 + cmac2accu_adder_5 + cmac2accu_adder_4;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_2 <= cmac2accu_adder_11 + cmac2accu_adder_10 + cmac2accu_adder_9 + cmac2accu_adder_8;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_2 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_2 <= cmac2accu_adder_11 + cmac2accu_adder_10 + cmac2accu_adder_9 + cmac2accu_adder_8;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_3 <= cmac2accu_adder_15 + cmac2accu_adder_14 + cmac2accu_adder_13 + cmac2accu_adder_12;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_3 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_3 <= cmac2accu_adder_15 + cmac2accu_adder_14 + cmac2accu_adder_13 + cmac2accu_adder_12;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_4 <= cmac2accu_adder_19 + cmac2accu_adder_18 + cmac2accu_adder_17 + cmac2accu_adder_16;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_4 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_4 <= cmac2accu_adder_19 + cmac2accu_adder_18 + cmac2accu_adder_17 + cmac2accu_adder_16;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_5 <= cmac2accu_adder_23 + cmac2accu_adder_22 + cmac2accu_adder_21 + cmac2accu_adder_20;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_5 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_5 <= cmac2accu_adder_23 + cmac2accu_adder_22 + cmac2accu_adder_21 + cmac2accu_adder_20;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_6 <= cmac2accu_adder_27 + cmac2accu_adder_26 + cmac2accu_adder_25 + cmac2accu_adder_24;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_6 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_6 <= cmac2accu_adder_27 + cmac2accu_adder_26 + cmac2accu_adder_25 + cmac2accu_adder_24;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_7 <= cmac2accu_adder_31 + cmac2accu_adder_30 + cmac2accu_adder_29 + cmac2accu_adder_28;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_7 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_7 <= cmac2accu_adder_31 + cmac2accu_adder_30 + cmac2accu_adder_29 + cmac2accu_adder_28;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_8 <= cmac2accu_adder_35 + cmac2accu_adder_34 + cmac2accu_adder_33 + cmac2accu_adder_32;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_8 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_8 <= cmac2accu_adder_35 + cmac2accu_adder_34 + cmac2accu_adder_33 + cmac2accu_adder_32;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_9 <= cmac2accu_adder_39 + cmac2accu_adder_38 + cmac2accu_adder_37 + cmac2accu_adder_36;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_9 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_9 <= cmac2accu_adder_39 + cmac2accu_adder_38 + cmac2accu_adder_37 + cmac2accu_adder_36;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_10 <= cmac2accu_adder_43 + cmac2accu_adder_42 + cmac2accu_adder_41 + cmac2accu_adder_40;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_10 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_10 <= cmac2accu_adder_43 + cmac2accu_adder_42 + cmac2accu_adder_41 + cmac2accu_adder_40;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_11 <= cmac2accu_adder_47 + cmac2accu_adder_46 + cmac2accu_adder_45 + cmac2accu_adder_44;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_11 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_11 <= cmac2accu_adder_47 + cmac2accu_adder_46 + cmac2accu_adder_45 + cmac2accu_adder_44;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_12 <= cmac2accu_adder_51 + cmac2accu_adder_50 + cmac2accu_adder_49 + cmac2accu_adder_48;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_12 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_12 <= cmac2accu_adder_51 + cmac2accu_adder_50 + cmac2accu_adder_49 + cmac2accu_adder_48;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_13 <= cmac2accu_adder_55 + cmac2accu_adder_54 + cmac2accu_adder_53 + cmac2accu_adder_52;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_13 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_13 <= cmac2accu_adder_55 + cmac2accu_adder_54 + cmac2accu_adder_53 + cmac2accu_adder_52;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_14 <= cmac2accu_adder_59 + cmac2accu_adder_58 + cmac2accu_adder_57 + cmac2accu_adder_56;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_14 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_14 <= cmac2accu_adder_59 + cmac2accu_adder_58 + cmac2accu_adder_57 + cmac2accu_adder_56;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level1_15 <= cmac2accu_adder_63 + cmac2accu_adder_62 + cmac2accu_adder_61 + cmac2accu_adder_60;
+        if (~ytydla_core_rst_n) begin
+            accu_level1_15 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level1_15 <= cmac2accu_adder_63 + cmac2accu_adder_62 + cmac2accu_adder_61 + cmac2accu_adder_60;
+        end
     end
 
 
 
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level2_0 <= accu_level1_3 + accu_level1_2 + accu_level1_1 + accu_level1_0;
+        if (~ytydla_core_rst_n) begin
+            accu_level2_0 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level2_0 <= accu_level1_3 + accu_level1_2 + accu_level1_1 + accu_level1_0;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level2_1 <= accu_level1_7 + accu_level1_6 + accu_level1_5 + accu_level1_4;
+        if (~ytydla_core_rst_n) begin
+            accu_level2_1 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level2_1 <= accu_level1_7 + accu_level1_6 + accu_level1_5 + accu_level1_4;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level2_2 <= accu_level1_11 + accu_level1_10 + accu_level1_9 + accu_level1_8;
+        if (~ytydla_core_rst_n) begin
+            accu_level2_2 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level2_2 <= accu_level1_11 + accu_level1_10 + accu_level1_9 + accu_level1_8;
+        end
     end
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu_level2_3 <= accu_level1_15 + accu_level1_14 + accu_level1_13 + accu_level1_12;
+        if (~ytydla_core_rst_n) begin
+            accu_level2_3 <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu_level2_3 <= accu_level1_15 + accu_level1_14 + accu_level1_13 + accu_level1_12;
+        end
     end
 
+
     always_ff   @(posedge ytydla_core_clk or negedge ytydla_core_rst_n) begin
-        accu2cmac_aggregation <= accu_level2_0 + accu_level2_1 + accu_level2_2 + accu_level2_3;
+        if (~ytydla_core_rst_n) begin
+            accu2cmac_aggregation <= `YTYDLA_DATA_LENGTH'b0;
+        end
+        else begin
+            accu2cmac_aggregation <= accu_level2_0 + accu_level2_1 + accu_level2_2 + accu_level2_3;
+        end
     end
 
 endmodule

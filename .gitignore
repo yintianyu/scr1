@@ -5,3 +5,4 @@ build/**
 *.vpw
 *.vpwhist
 *.log
+*.rpt

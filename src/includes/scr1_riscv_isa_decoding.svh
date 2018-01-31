@@ -36,7 +36,8 @@ typedef enum logic [6:2] {
     SCR1_OPCODE_SYSTEM      = 5'b11100,
     SCR1_OPCODE_LOAD_Y      = 5'b00001,
     SCR1_OPCODE_STORE_Y     = 5'b01001,
-    SCR1_OPCODE_OP_DLA        = 5'b01110
+    SCR1_OPCODE_OP_DLA      = 5'b01110,
+    SCR1_OPCODE_SHIFT       = 5'b01010
 } type_scr1_rvi_opcode_e;
 `else
 typedef enum logic [6:2] {
@@ -144,7 +145,7 @@ typedef enum logic [SCR1_LSU_CMD_WIDTH_E-1:0] {
 `ifdef SCR1_RVY_EXT
 localparam SCR1_LSU_Y_CMD_ALL_NUM_E   = 6;
 localparam SCR1_LSU_Y_CMD_WIDTH_E     = $clog2(SCR1_LSU_Y_CMD_ALL_NUM_E);
-typedef enum logic [SCR1_LSU_CMD_WIDTH_E-1:0] {
+typedef enum logic [SCR1_LSU_Y_CMD_WIDTH_E-1:0] {
     SCR1_LSU_Y_CMD_NONE = '0,
     SCR1_LSU_Y_CMD_ONE_WORD,
     SCR1_LSU_Y_CMD_TWO_WORDS,
@@ -180,12 +181,14 @@ typedef enum logic [SCR1_CSR_CMD_WIDTH_E-1:0] {
 // DLA commands
 //-------------------------------------------------------------------------------
 `ifdef SCR1_RVY_EXT
-localparam SCR1_DLA_CMD_ALL_NUM_E   = 3;
+localparam SCR1_DLA_CMD_ALL_NUM_E   = 5;
 localparam SCR1_DLA_CMD_WIDTH_E     = $clog2(SCR1_DLA_CMD_ALL_NUM_E);
 typedef enum logic [SCR1_DLA_CMD_WIDTH_E-1:0] {
     SCR1_DLA_CMD_NONE = '0,
     SCR1_DLA_CMD_CMAC,
-    SCR1_DLA_CMD_VINP
+    SCR1_DLA_CMD_VINP,
+    SCR1_DLA_CMD_SHIFT_DAT,
+    SCR1_DLA_CMD_SHIFT_WT
 } type_scr1_dla_cmd_sel_e;
 `endif  // SCR1_RVY_EXT
 
@@ -224,6 +227,7 @@ typedef struct packed {
     logic [8:0]                         rd_wb_y_addr;
     type_scr1_dla_cmd_sel_e             dla_cmd;
     type_scr1_lsu_y_cmd_sel_e           lsu_y_cmd;
+    
 `endif  // SCR1_RVY_EXT
     logic                               jump_req;
     logic                               branch_req;
@@ -247,7 +251,7 @@ typedef struct packed {
 `ifndef SCR1_RVC_EXT
 localparam SCR1_INSTR_SORT_ALL_NUM_E = 4;
 `else
-localparam SCR1_INSTR_SORT_ALL_NUM_E = 8;
+localparam SCR1_INSTR_SORT_ALL_NUM_E = 10;
 `endif // ~SCR1_RVC_EXT
 localparam SCR1_INSTR_SORT_WIDTH_E = $clog2(SCR1_INSTR_SORT_ALL_NUM_E);
 typedef enum logic[SCR1_INSTR_SORT_WIDTH_E - 1: 0]{
@@ -262,6 +266,11 @@ typedef enum logic[SCR1_INSTR_SORT_WIDTH_E - 1: 0]{
     SCR1_INSTR_SORT_RVC_LS,
     SCR1_INSTR_SORT_RVC_OTHER
 `endif // SCR1_RVC_EXT
+`ifdef SCR1_RVY_EXT
+    ,
+    SCR1_INSTR_SORT_RVY_CAL,
+    SCR1_INSTR_SORT_RVY_LS
+`endif // SCR1_RVY_EXT
 } type_scr1_instr_sort_sel_e;
 `endif // SCR1_INSTR_SORT
 
